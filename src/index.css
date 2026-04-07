@@ -1,111 +1,156 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+@import 'tailwindcss';
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/* Theme tokens live here so future color and spacing changes stay centralized. */
+@theme {
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --color-brand-50: #f4fef8;
+  --color-brand-300: #8df0ca;
+  --color-brand-400: #61e7bb;
+  --color-brand-500: #29d391;
+  --color-brand-700: #119164;
+  --color-ink-950: #07111f;
+  --color-ink-900: #0d1b2d;
+  --color-ink-800: #142742;
+  --color-ink-700: #223554;
+  --color-slate-300: #b1c1d7;
+  --color-slate-200: #ced8e7;
+  --color-slate-100: #ebf0f7;
+  --color-warning-400: #f6c760;
+  --color-danger-400: #ff7f7f;
+}
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Base styles for the whole application shell. */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  body {
+    @apply m-0 min-h-screen bg-ink-950 font-body text-slate-100;
+    background-image:
+      radial-gradient(circle at top, rgba(41, 211, 145, 0.18), transparent 28%),
+      linear-gradient(180deg, #0d1b2d 0%, #07111f 100%);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+  }
+
+  #root {
+    @apply min-h-screen;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+/* Shared component utilities used across routed pages. */
+@layer components {
+  .glass-panel {
+    @apply rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/20 backdrop-blur;
   }
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  .section-shell {
+    @apply flex flex-col gap-6;
+  }
+
+  .page-title {
+    @apply font-display text-4xl font-bold tracking-tight text-white md:text-5xl;
+  }
+
+  .page-subtitle {
+    @apply max-w-3xl text-sm leading-7 text-slate-300 md:text-base;
+  }
+
+  .stat-card {
+    @apply rounded-3xl border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur;
+  }
+
+  .input-field {
+    @apply w-full rounded-2xl border border-white/10 bg-ink-900/70 px-4 py-3 text-slate-100 outline-none transition focus:border-brand-400;
+  }
+
+  .primary-button {
+    @apply inline-flex items-center justify-center rounded-full bg-brand-400 px-5 py-3 font-semibold text-ink-950 transition hover:bg-brand-300;
+  }
+
+  .secondary-button {
+    @apply inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 font-semibold text-white transition hover:bg-white/10;
   }
 }
 
-body {
-  margin: 0;
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+@media (min-width: 1280px) {
+  .app-shell {
+    grid-template-columns: 96px minmax(0, 1fr);
+    transition: grid-template-columns 220ms ease;
   }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+
+  .app-shell:has(.sidebar-shell:hover) {
+    grid-template-columns: 280px minmax(0, 1fr);
   }
-}
-p {
-  margin: 0;
-}
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
+  .sidebar-shell {
+    overflow: hidden;
+    transition:
+      width 220ms ease,
+      background-color 220ms ease;
+  }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  .sidebar-scroll {
+    overflow: hidden;
+    scrollbar-width: none;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sidebar-shell .sidebar-link {
+    justify-content: center;
+    padding-inline: 0.875rem;
+  }
+
+  .sidebar-shell .sidebar-copy,
+  .sidebar-shell .sidebar-action {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-10px);
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease;
+    white-space: nowrap;
+  }
+
+  .sidebar-shell .sidebar-copy {
+    width: 0;
+    overflow: hidden;
+  }
+
+  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-scroll {
+    overflow-y: auto;
+  }
+
+  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-copy,
+  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-action {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-copy {
+    width: auto;
+  }
+
+  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-link {
+    justify-content: flex-start;
+  }
 }
