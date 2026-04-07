@@ -1,3 +1,4 @@
+// Generic table for simple data pages like standings and results.
 function DataTable({ columns, rows }) {
   return (
     <div className="overflow-hidden rounded-3xl border border-white/10">

@@ -2,6 +2,7 @@ import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 import { savedMatches } from '../data/mockData'
 
+// Saved matches page.
 function FavoritesPage() {
   return (
     <div className="section-shell">

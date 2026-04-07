@@ -1,3 +1,4 @@
+// Shared page intro block for headings and optional actions.
 function PageHero({ eyebrow, title, description, actions }) {
   return (
     <section className="glass-panel overflow-hidden p-6 md:p-8">

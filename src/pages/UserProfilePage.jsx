@@ -1,6 +1,7 @@
 import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 
+// User profile page.
 function UserProfilePage() {
   return (
     <div className="section-shell">

@@ -2,6 +2,7 @@ import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 import { quickStats } from '../data/mockData'
 
+// Standalone match analysis page.
 function MatchAnalysisPage() {
   return (
     <div className="section-shell">

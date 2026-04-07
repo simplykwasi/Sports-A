@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 
+// Small team display used inside the match list card.
 function TeamPill({ team }) {
   return (
     <div className="flex items-center gap-3">
@@ -16,6 +17,7 @@ function TeamPill({ team }) {
   )
 }
 
+// Clickable match card that routes to the full match details page.
 function MatchListCard({ match }) {
   return (
     <Link

@@ -1,6 +1,7 @@
 import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 
+// User/app settings page.
 function SettingsPage() {
   return (
     <div className="section-shell">

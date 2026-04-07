@@ -59,6 +59,7 @@ function MatchDetailsPage() {
     return <Navigate to="/matches" replace />
   }
 
+  // Match details come from mockData.js for now.
   const details = matchDetailsById[match.id]
   const statRows = details.stats.map((stat) => {
     const [leftValue, rightValue] = stat.value.includes(' vs ')
@@ -82,8 +83,9 @@ function MatchDetailsPage() {
         description={`${match.kickoff} · ${match.venue}. The full comparison stays on one page so users can read both teams side by side before deciding whether to follow the system bet.`}
       />
 
-      {/* Mobile-first comparison sheet with left-vs-right data kept visible on smaller screens. */}
+      {/* Main match comparison area. Edit the page structure below section by section. */}
       <section className="border border-white/10 bg-white/4 px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6">
+        {/* Match header */}
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-white/10 pb-5 sm:gap-4 sm:pb-6">
           <TeamHeader team={match.home} side="left" />
           <p className="text-center font-display text-xl font-bold text-brand-300 sm:text-2xl">
@@ -92,6 +94,7 @@ function MatchDetailsPage() {
           <TeamHeader team={match.away} side="right" />
         </div>
 
+        {/* Recent match results */}
         <div className="border-b border-white/10 py-5 sm:py-6">
           <div className="mb-4 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">
@@ -127,6 +130,7 @@ function MatchDetailsPage() {
           </div>
         </div>
 
+        {/* Side-by-side stats row */}
         <div className="border-b border-white/10 py-5 sm:py-6">
           <div className="mb-4 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">
@@ -155,6 +159,7 @@ function MatchDetailsPage() {
           </div>
         </div>
 
+        {/* Notes and standings */}
         <div className="grid gap-6 border-b border-white/10 py-5 sm:py-6 xl:grid-cols-2">
           <div>
             <p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">
@@ -193,6 +198,7 @@ function MatchDetailsPage() {
           </div>
         </div>
 
+        {/* Odds, value bets, and totals */}
         <div className="grid gap-6 border-b border-white/10 py-5 sm:py-6 xl:grid-cols-2">
           <div>
             <p className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">
@@ -251,6 +257,7 @@ function MatchDetailsPage() {
           </div>
         </div>
 
+        {/* Final system recommendation */}
         <div className="grid gap-4 pt-5 sm:pt-6 xl:grid-cols-[1.2fr_0.8fr] xl:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">

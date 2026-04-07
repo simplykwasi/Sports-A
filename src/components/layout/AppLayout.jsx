@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 
+// Main app frame: sidebar, topbar, and page outlet.
 function AppLayout() {
   // Controls the off-canvas sidebar on mobile and tablet screens.
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)

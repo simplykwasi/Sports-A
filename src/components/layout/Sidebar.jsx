@@ -3,9 +3,11 @@ import { FiX } from 'react-icons/fi'
 import { navigationGroups } from '../../data/navigation'
 import BrandLogo from '../ui/BrandLogo'
 
+// Main sidebar with desktop rail behavior and mobile drawer behavior.
 function Sidebar({ isMobileOpen = false, onClose }) {
   return (
     <>
+      {/* Mobile/tablet overlay behind the drawer */}
       <button
         type="button"
         aria-label="Close sidebar overlay"
@@ -23,6 +25,7 @@ function Sidebar({ isMobileOpen = false, onClose }) {
         ].join(' ')}
       >
         <div className="mb-5 flex items-center justify-between gap-2 md:gap-3 xl:mb-10">
+          {/* Sidebar brand area */}
           <BrandLogo
             size="sm"
             className="min-w-0"
@@ -45,6 +48,7 @@ function Sidebar({ isMobileOpen = false, onClose }) {
           </div>
         </div>
 
+        {/* Sidebar links are controlled from navigation.js */}
         <div className="sidebar-scroll min-h-0 flex-1 space-y-6 overflow-y-auto pr-1 xl:pr-2">
           {navigationGroups.map((group) => (
             <section key={group.title}>

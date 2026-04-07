@@ -6,6 +6,7 @@ import SectionCard from '../components/ui/SectionCard'
 import StatCard from '../components/ui/StatCard'
 import { featuredMatches, heroMetrics, notificationFeed } from '../data/mockData'
 
+// Main user dashboard.
 function DashboardPage() {
   // Temporary frontend-only account gate.
   // Change this to your real auth/user state later.

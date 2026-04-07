@@ -3,6 +3,7 @@ import SectionCard from '../components/ui/SectionCard'
 import StatCard from '../components/ui/StatCard'
 import { adminCards } from '../data/mockData'
 
+// Admin-only overview page.
 function AdminPanelPage() {
   return (
     <div className="section-shell">

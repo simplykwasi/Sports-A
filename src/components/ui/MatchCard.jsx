@@ -1,3 +1,4 @@
+// Compact match summary card used on overview pages.
 function MatchCard({ match }) {
   return (
     <article className="glass-panel p-5">

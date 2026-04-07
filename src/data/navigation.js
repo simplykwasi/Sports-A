@@ -19,7 +19,7 @@ import {
   FiUsers,
 } from 'react-icons/fi'
 
-// Sidebar route metadata lives here so navigation labels and icons are easy to maintain.
+// Edit sidebar groups, labels, and route links here.
 export const navigationGroups = [
   {
     title: 'Core',

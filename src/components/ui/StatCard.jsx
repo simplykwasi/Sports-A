@@ -1,3 +1,4 @@
+// Small KPI card for dashboard and overview metrics.
 function StatCard({ label, value, helper }) {
   return (
     <article className="stat-card">

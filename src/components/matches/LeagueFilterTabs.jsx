@@ -1,3 +1,4 @@
+// League selector shown above the match list.
 function LeagueFilterTabs({ leagues, activeLeague, onSelect }) {
   return (
     <div className="flex gap-3 overflow-x-auto pb-2">

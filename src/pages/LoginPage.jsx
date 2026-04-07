@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import BrandLogo from '../components/ui/BrandLogo'
 
+// Login screen for returning users.
 function LoginPage() {
   return (
     <section className="flex min-h-[calc(100vh-12rem)] items-center justify-center py-6">

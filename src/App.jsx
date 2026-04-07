@@ -22,7 +22,7 @@ import FavoritesPage from './pages/FavoritesPage'
 import SettingsPage from './pages/SettingsPage'
 import AdminPanelPage from './pages/AdminPanelPage'
 
-// Central route table so future edits stay in one easy-to-scan file.
+// Edit routes here when adding, removing, or renaming pages.
 const appRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
@@ -51,6 +51,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Shared app shell for pages that use the main sidebar/topbar layout. */}
         <Route element={<AppLayout />}>
           {appRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />

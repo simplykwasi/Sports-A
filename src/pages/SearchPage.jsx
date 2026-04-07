@@ -1,6 +1,7 @@
 import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 
+// Global search page.
 function SearchPage() {
   return (
     <div className="section-shell">

@@ -2,6 +2,7 @@ import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 import { notificationFeed } from '../data/mockData'
 
+// Notifications page.
 function NotificationsPage() {
   return (
     <div className="section-shell">

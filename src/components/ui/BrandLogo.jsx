@@ -1,3 +1,4 @@
+// Reusable Sports A brand mark and wordmark.
 function BrandLogo({
   size = 'md',
   showWordmark = true,

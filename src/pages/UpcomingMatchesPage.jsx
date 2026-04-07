@@ -7,6 +7,7 @@ import { matchLeagueTabs, matchListings } from '../data/mockData'
 function UpcomingMatchesPage() {
   const [activeLeague, setActiveLeague] = useState('All leagues')
 
+  // League filter for the match list page.
   const visibleMatches = useMemo(() => {
     if (activeLeague === 'All leagues') {
       return matchListings
@@ -24,6 +25,7 @@ function UpcomingMatchesPage() {
       />
 
       <section className="glass-panel p-4 md:p-6">
+        {/* Edit league tabs from mockData.js */}
         <LeagueFilterTabs
           leagues={matchLeagueTabs}
           activeLeague={activeLeague}
@@ -32,6 +34,7 @@ function UpcomingMatchesPage() {
       </section>
 
       <section className="grid gap-4">
+        {/* Edit match cards/listings from mockData.js */}
         {visibleMatches.map((match) => (
           <MatchListCard key={match.id} match={match} />
         ))}

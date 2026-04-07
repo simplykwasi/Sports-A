@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 
+// Registration page for new users.
 function RegisterPage() {
   return (
     <div className="section-shell">

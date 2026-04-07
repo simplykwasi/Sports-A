@@ -35,6 +35,7 @@ export const featuredMatches = [
   },
 ]
 
+// Edit the league tabs shown on the matches page here.
 export const matchLeagueTabs = [
   'All leagues',
   'Premier League',
@@ -43,6 +44,7 @@ export const matchLeagueTabs = [
   'Bundesliga',
 ]
 
+// Edit the match list cards here.
 export const matchListings = [
   {
     id: 'arsenal-newcastle',
@@ -90,6 +92,7 @@ export const matchDetailTabs = [
   'Over/Under Bets',
 ]
 
+// Edit the full match analysis page content here.
 export const matchDetailsById = {
   'arsenal-newcastle': {
     headline: 'Arsenal carry the stronger attacking form, while Newcastle are giving up high-quality chances away from home.',

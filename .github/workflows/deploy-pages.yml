@@ -1,3 +1,4 @@
+# GitHub Pages workflow for building the Vite app and publishing dist/.
 name: Deploy To GitHub Pages
 
 on:

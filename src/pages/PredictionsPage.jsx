@@ -2,6 +2,7 @@ import MatchCard from '../components/ui/MatchCard'
 import PageHero from '../components/ui/PageHero'
 import { featuredMatches } from '../data/mockData'
 
+// Standalone predictions overview page.
 function PredictionsPage() {
   return (
     <div className="section-shell">

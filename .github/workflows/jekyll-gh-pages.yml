@@ -1,4 +1,4 @@
-# Sample workflow for building and deploying a Jekyll site to GitHub Pages
+# Old Jekyll Pages workflow kept in the repo; not used by this Vite app.
 name: Deploy Jekyll with GitHub Pages dependencies preinstalled
 
 on:

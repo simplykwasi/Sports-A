@@ -1,3 +1,4 @@
+// Reusable content section wrapper for grouped page content.
 function SectionCard({ title, description, children }) {
   return (
     <section className="glass-panel p-6">

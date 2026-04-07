@@ -3,6 +3,7 @@ import SectionCard from '../components/ui/SectionCard'
 import StatCard from '../components/ui/StatCard'
 import { quickStats } from '../data/mockData'
 
+// Standalone statistics page.
 function StatisticsPage() {
   return (
     <div className="section-shell">

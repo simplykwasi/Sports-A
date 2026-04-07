@@ -5,6 +5,7 @@ import SectionCard from '../components/ui/SectionCard'
 import StatCard from '../components/ui/StatCard'
 import { featuredMatches, heroMetrics, quickStats } from '../data/mockData'
 
+// Public homepage.
 function LandingPage() {
   return (
     <div className="section-shell">
