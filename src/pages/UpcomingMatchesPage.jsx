@@ -1,19 +1,39 @@
-import MatchCard from '../components/ui/MatchCard'
+import { useMemo, useState } from 'react'
+import LeagueFilterTabs from '../components/matches/LeagueFilterTabs'
+import MatchListCard from '../components/matches/MatchListCard'
 import PageHero from '../components/ui/PageHero'
-import { featuredMatches } from '../data/mockData'
+import { matchLeagueTabs, matchListings } from '../data/mockData'
 
 function UpcomingMatchesPage() {
+  const [activeLeague, setActiveLeague] = useState('All leagues')
+
+  const visibleMatches = useMemo(() => {
+    if (activeLeague === 'All leagues') {
+      return matchListings
+    }
+
+    return matchListings.filter((match) => match.league === activeLeague)
+  }, [activeLeague])
+
   return (
     <div className="section-shell">
       <PageHero
-        eyebrow="Upcoming matches"
-        title="Browse the next slate of fixtures."
-        description="This page is the natural place for league filters, kickoff sorting, and quick links into deeper match analysis."
+        eyebrow="Matches"
+        title="Browse matches by league."
+        description="Pick a league, then open any match to move into a full analysis page with form, stats, odds, and the recommended bet."
       />
 
-      <section className="grid gap-4 lg:grid-cols-3">
-        {featuredMatches.map((match) => (
-          <MatchCard key={`${match.home}-${match.away}`} match={match} />
+      <section className="glass-panel p-4 md:p-6">
+        <LeagueFilterTabs
+          leagues={matchLeagueTabs}
+          activeLeague={activeLeague}
+          onSelect={setActiveLeague}
+        />
+      </section>
+
+      <section className="grid gap-4">
+        {visibleMatches.map((match) => (
+          <MatchListCard key={match.id} match={match} />
         ))}
       </section>
     </div>

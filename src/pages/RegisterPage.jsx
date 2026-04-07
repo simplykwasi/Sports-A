@@ -12,38 +12,23 @@ function RegisterPage() {
       />
 
       <SectionCard title="Register" description="Use this page for onboarding new users and plan selections later.">
-        <form className="grid gap-4 md:grid-cols-2">
+        <form className="grid gap-4 md:max-w-xl">
           <div>
-            <label className="mb-2 block text-sm text-slate-300">First name</label>
-            <input className="input-field" type="text" placeholder="Alex" />
+            <label className="mb-2 block text-sm text-slate-300">Username</label>
+            <input className="input-field" type="text" placeholder="sportsa_user" />
           </div>
           <div>
-            <label className="mb-2 block text-sm text-slate-300">Last name</label>
-            <input className="input-field" type="text" placeholder="Morgan" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="mb-2 block text-sm text-slate-300">Email address</label>
-            <input className="input-field" type="email" placeholder="alex@sportsa.com" />
+            <label className="mb-2 block text-sm text-slate-300">Phone number</label>
+            <input className="input-field" type="tel" placeholder="+234 801 234 5678" />
           </div>
           <div>
             <label className="mb-2 block text-sm text-slate-300">Password</label>
             <input className="input-field" type="password" placeholder="Choose a password" />
           </div>
-          <div>
-            <label className="mb-2 block text-sm text-slate-300">Favorite league</label>
-            <select className="input-field" defaultValue="Premier League">
-              <option>Premier League</option>
-              <option>La Liga</option>
-              <option>Serie A</option>
-              <option>Bundesliga</option>
-            </select>
-          </div>
-          <div className="md:col-span-2">
-            <button type="button" className="primary-button">
-              Create account
-            </button>
-          </div>
-          <p className="text-sm text-slate-300 md:col-span-2">
+          <button type="button" className="primary-button">
+            Create account
+          </button>
+          <p className="text-sm text-slate-300">
             Already registered?{' '}
             <Link to="/login" className="text-brand-300">
               Sign in here

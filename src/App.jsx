@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import UpcomingMatchesPage from './pages/UpcomingMatchesPage'
+import MatchDetailsPage from './pages/MatchDetailsPage'
 import MatchAnalysisPage from './pages/MatchAnalysisPage'
 import PredictionsPage from './pages/PredictionsPage'
 import StatisticsPage from './pages/StatisticsPage'
@@ -27,7 +28,8 @@ const appRoutes = [
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
   { path: '/dashboard', element: <DashboardPage /> },
-  { path: '/upcoming-matches', element: <UpcomingMatchesPage /> },
+  { path: '/matches', element: <UpcomingMatchesPage /> },
+  { path: '/matches/:matchId', element: <MatchDetailsPage /> },
   { path: '/match-analysis', element: <MatchAnalysisPage /> },
   { path: '/predictions', element: <PredictionsPage /> },
   { path: '/statistics', element: <StatisticsPage /> },

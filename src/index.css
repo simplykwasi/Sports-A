@@ -106,7 +106,7 @@
   }
 
   .sidebar-scroll {
-    overflow: hidden;
+    overflow-y: auto;
     scrollbar-width: none;
   }
 
@@ -133,10 +133,6 @@
   .sidebar-shell .sidebar-copy {
     width: 0;
     overflow: hidden;
-  }
-
-  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-scroll {
-    overflow-y: auto;
   }
 
   .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-copy,

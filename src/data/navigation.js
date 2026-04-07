@@ -26,7 +26,7 @@ export const navigationGroups = [
     links: [
       { label: 'Landing', to: '/', icon: FiHome },
       { label: 'Dashboard', to: '/dashboard', icon: FiGrid },
-      { label: 'Upcoming Matches', to: '/upcoming-matches', icon: FiCompass },
+      { label: 'Matches', to: '/matches', icon: FiCompass },
       { label: 'Match Analysis', to: '/match-analysis', icon: FiActivity },
       { label: 'Predictions', to: '/predictions', icon: FiTarget },
       { label: 'Statistics', to: '/statistics', icon: FiBarChart2 },
