@@ -9,7 +9,6 @@ import MatchDetailsPage from './pages/MatchDetailsPage'
 import LeagueStandingsPage from './pages/LeagueStandingsPage'
 import UserProfilePage from './pages/UserProfilePage'
 import NotificationsPage from './pages/NotificationsPage'
-import SearchPage from './pages/SearchPage'
 import FavoritesPage from './pages/FavoritesPage'
 import SettingsPage from './pages/SettingsPage'
 import AdminPanelPage from './pages/AdminPanelPage'
@@ -25,7 +24,6 @@ const appRoutes = [
   { path: '/league-standings', element: <LeagueStandingsPage /> },
   { path: '/profile', element: <UserProfilePage /> },
   { path: '/notifications', element: <NotificationsPage /> },
-  { path: '/search', element: <SearchPage /> },
   { path: '/favorites', element: <FavoritesPage /> },
   { path: '/settings', element: <SettingsPage /> },
   { path: '/admin', element: <AdminPanelPage /> },

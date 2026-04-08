@@ -37,15 +37,25 @@ export const featuredMatches = [
 
 // Edit the league tabs shown on the matches page here.
 export const matchLeagueTabs = [
+  'Live',
   'All leagues',
   'Premier League',
   'La Liga',
   'Serie A',
   'Bundesliga',
+  'Ligue 1',
 ]
 
 // Edit the match list cards here.
 export const matchListings = [
+  {
+    id: 'inter-milan',
+    league: 'Serie A',
+    kickoff: 'Live - 68 mins',
+    venue: 'San Siro',
+    home: { name: 'Inter', shortName: 'INT', crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20' },
+    away: { name: 'AC Milan', shortName: 'MIL', crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20' },
+  },
   {
     id: 'arsenal-newcastle',
     league: 'Premier League',
@@ -78,6 +88,60 @@ export const matchListings = [
     home: { name: 'Dortmund', shortName: 'BVB', crestColor: 'bg-yellow-400/15 text-yellow-200 border-yellow-300/20' },
     away: { name: 'Leipzig', shortName: 'RBL', crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20' },
   },
+  {
+    id: 'psg-monaco',
+    league: 'Ligue 1',
+    kickoff: 'Live - 34 mins',
+    venue: 'Parc des Princes',
+    home: { name: 'PSG', shortName: 'PSG', crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20' },
+    away: { name: 'Monaco', shortName: 'MON', crestColor: 'bg-amber-500/15 text-amber-300 border-amber-400/20' },
+  },
+]
+
+// Edit the mixed live and upcoming matches shown on the Home page here.
+export const todaysMatches = [
+  {
+    id: 'inter-milan',
+    status: 'Live',
+    minute: "68'",
+    league: 'Serie A',
+    home: { name: 'Inter', shortName: 'INT', crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20' },
+    away: { name: 'AC Milan', shortName: 'MIL', crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20' },
+    score: '2 - 1',
+  },
+  {
+    id: 'arsenal-newcastle',
+    status: 'Upcoming',
+    kickoff: '18:30 UTC',
+    league: 'Premier League',
+    home: { name: 'Arsenal', shortName: 'ARS', crestColor: 'bg-red-500/15 text-red-300 border-red-400/20' },
+    away: { name: 'Newcastle', shortName: 'NEW', crestColor: 'bg-slate-300/15 text-slate-200 border-slate-300/20' },
+  },
+  {
+    id: 'sociedad-atletico',
+    status: 'Upcoming',
+    kickoff: '20:00 UTC',
+    league: 'La Liga',
+    home: { name: 'Real Sociedad', shortName: 'RSO', crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20' },
+    away: { name: 'Atletico Madrid', shortName: 'ATM', crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20' },
+  },
+  {
+    id: 'psg-monaco',
+    status: 'Live',
+    minute: "34'",
+    league: 'Ligue 1',
+    home: { name: 'PSG', shortName: 'PSG', crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20' },
+    away: { name: 'Monaco', shortName: 'MON', crestColor: 'bg-amber-500/15 text-amber-300 border-amber-400/20' },
+    score: '1 - 0',
+  },
+  {
+    id: 'dortmund-leipzig',
+    status: 'Upcoming',
+    kickoff: '17:30 UTC',
+    league: 'Bundesliga',
+    home: { name: 'Dortmund', shortName: 'BVB', crestColor: 'bg-yellow-400/15 text-yellow-200 border-yellow-300/20' },
+    away: { name: 'Leipzig', shortName: 'RBL', crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20' },
+  },
 ]
 
 export const matchDetailTabs = [
@@ -91,6 +155,136 @@ export const matchDetailTabs = [
   'Value Bets',
   'Over/Under Bets',
 ]
+
+// Edit live match pages here. These details are only shown for matches already in play.
+export const liveMatchDetailsById = {
+  'inter-milan': {
+    matchType: 'Serie A Matchday 30',
+    venue: 'San Siro, Milan',
+    referee: 'Daniele Orsato',
+    minute: "68'",
+    score: { home: 2, away: 1 },
+    scorers: [
+      { minute: "12'", player: 'Lautaro Martinez', team: 'Inter' },
+      { minute: "39'", player: 'Christian Pulisic', team: 'AC Milan' },
+      { minute: "56'", player: 'Hakan Calhanoglu', team: 'Inter' },
+    ],
+    timeline: [
+      { minute: "12'", type: 'Goal', team: 'Inter', detail: 'Lautaro Martinez finishes from inside the box.' },
+      { minute: "24'", type: 'Yellow Card', team: 'AC Milan', detail: 'Tomori booked for a late challenge.' },
+      { minute: "39'", type: 'Goal', team: 'AC Milan', detail: 'Pulisic scores after a quick counterattack.' },
+      { minute: "56'", type: 'Goal', team: 'Inter', detail: 'Calhanoglu converts from the edge of the area.' },
+      { minute: "63'", type: 'Substitution', team: 'Inter', detail: 'Frattesi on for Mkhitaryan.' },
+    ],
+    homeTeam: {
+      formation: '3-5-2',
+      lineup: [
+        'Sommer',
+        'Pavard',
+        'Acerbi',
+        'Bastoni',
+        'Darmian',
+        'Barella',
+        'Calhanoglu',
+        'Mkhitaryan',
+        'Dimarco',
+        'Thuram',
+        'Lautaro Martinez',
+      ],
+    },
+    awayTeam: {
+      formation: '4-2-3-1',
+      lineup: [
+        'Maignan',
+        'Calabria',
+        'Tomori',
+        'Thiaw',
+        'Hernandez',
+        'Reijnders',
+        'Bennacer',
+        'Pulisic',
+        'Loftus-Cheek',
+        'Leao',
+        'Giroud',
+      ],
+    },
+    stats: [
+      { label: 'Possession', home: '57%', away: '43%' },
+      { label: 'Shots on target', home: '7', away: '4' },
+      { label: 'Corners', home: '6', away: '3' },
+      { label: 'xG', home: '1.92', away: '0.98' },
+      { label: 'Dangerous attacks', home: '41', away: '26' },
+    ],
+    livePrediction: {
+      headline: 'Inter still look more likely to hold the lead, but Milan remain dangerous in transition.',
+      likelyWinner: 'Inter',
+      confidence: 'Live confidence - 64%',
+      recommendedBet: 'Inter or draw',
+      note: 'The prediction can keep changing as the match stats and game state update.',
+    },
+  },
+  'psg-monaco': {
+    matchType: 'Ligue 1 Matchday 29',
+    venue: 'Parc des Princes, Paris',
+    referee: 'Francois Letexier',
+    minute: "34'",
+    score: { home: 1, away: 0 },
+    scorers: [
+      { minute: "18'", player: 'Kylian Mbappe', team: 'PSG' },
+    ],
+    timeline: [
+      { minute: "18'", type: 'Goal', team: 'PSG', detail: 'Mbappe scores after a through ball from midfield.' },
+      { minute: "22'", type: 'Yellow Card', team: 'Monaco', detail: 'Zakaria booked for stopping a break.' },
+      { minute: "29'", type: 'Chance', team: 'Monaco', detail: 'Ben Yedder forces a strong save from Donnarumma.' },
+    ],
+    homeTeam: {
+      formation: '4-3-3',
+      lineup: [
+        'Donnarumma',
+        'Hakimi',
+        'Marquinhos',
+        'Skriniar',
+        'Mendes',
+        'Vitinha',
+        'Ugarte',
+        'Ruiz',
+        'Dembele',
+        'Mbappe',
+        'Barcola',
+      ],
+    },
+    awayTeam: {
+      formation: '4-4-2',
+      lineup: [
+        'Kohn',
+        'Vanderson',
+        'Singo',
+        'Maripan',
+        'Jakobs',
+        'Golovin',
+        'Zakaria',
+        'Camara',
+        'Minamino',
+        'Ben Yedder',
+        'Balogun',
+      ],
+    },
+    stats: [
+      { label: 'Possession', home: '61%', away: '39%' },
+      { label: 'Shots on target', home: '5', away: '2' },
+      { label: 'Corners', home: '4', away: '1' },
+      { label: 'xG', home: '1.11', away: '0.42' },
+      { label: 'Dangerous attacks', home: '24', away: '14' },
+    ],
+    livePrediction: {
+      headline: 'PSG control most of the ball and territory, so they remain the stronger side at this stage.',
+      likelyWinner: 'PSG',
+      confidence: 'Live confidence - 67%',
+      recommendedBet: 'PSG to win',
+      note: 'This live call should update if Monaco start creating better chances.',
+    },
+  },
+}
 
 // Edit the full match analysis page content here.
 export const matchDetailsById = {

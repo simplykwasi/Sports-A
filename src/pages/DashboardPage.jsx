@@ -4,15 +4,12 @@ import MatchCard from '../components/ui/MatchCard'
 import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 import StatCard from '../components/ui/StatCard'
+import { useAuth } from '../hooks/useAuth'
 import { featuredMatches, heroMetrics, notificationFeed } from '../data/mockData'
 
 // Main user dashboard.
 function DashboardPage() {
-  // Temporary frontend-only account gate.
-  // Change this to your real auth/user state later.
-  const hasAccount =
-    typeof window !== 'undefined' &&
-    window.localStorage.getItem('sportsAHasAccount') === 'true'
+  const { currentUser, hasAccount } = useAuth()
 
   // Dashboard fallback for visitors who do not have an account yet.
   if (!hasAccount) {
@@ -47,7 +44,7 @@ function DashboardPage() {
     <div className="section-shell">
       <PageHero
         eyebrow="Dashboard"
-        title="A command center for your daily football betting workflow."
+        title={`Welcome back, ${currentUser.username}.`}
         description="Use the dashboard to pull together model signals, favorite matches, and alerts into one starting view."
       />
 
