@@ -72,6 +72,8 @@ export function AuthProvider({ children }) {
           phoneNumber: normalizedPhoneNumber,
           password: normalizedPassword,
           joinedAt: new Date().toISOString(),
+          favoriteTeams: [],
+          favoriteLeagues: [],
         }
 
         persistUsers([...storedUsers, newUser])
@@ -79,6 +81,62 @@ export function AuthProvider({ children }) {
         setAuthState({ currentUser: newUser, isAuthReady: true })
 
         return { ok: true, user: newUser }
+      },
+      updatePreferences: ({ favoriteTeams, favoriteLeagues }) => {
+        if (!currentUser) {
+          return { ok: false, error: 'No active account.' }
+        }
+
+        const storedUsers = readStoredUsers()
+        const updatedUsers = storedUsers.map((user) => {
+          if (user.username !== currentUser.username) {
+            return user
+          }
+
+          return {
+            ...user,
+            favoriteTeams,
+            favoriteLeagues,
+          }
+        })
+
+        persistUsers(updatedUsers)
+
+        const updatedUser = updatedUsers.find((user) => user.username === currentUser.username)
+        setAuthState({ currentUser: updatedUser, isAuthReady: true })
+
+        return { ok: true, user: updatedUser }
+      },
+      updateProfile: ({ phoneNumber, password }) => {
+        if (!currentUser) {
+          return { ok: false, error: 'No active account.' }
+        }
+
+        const normalizedPhoneNumber = phoneNumber.trim()
+
+        if (!normalizedPhoneNumber) {
+          return { ok: false, error: 'Enter a phone number.' }
+        }
+
+        const storedUsers = readStoredUsers()
+        const updatedUsers = storedUsers.map((user) => {
+          if (user.username !== currentUser.username) {
+            return user
+          }
+
+          return {
+            ...user,
+            phoneNumber: normalizedPhoneNumber,
+            password: password && password.trim() ? password.trim() : user.password,
+          }
+        })
+
+        persistUsers(updatedUsers)
+
+        const updatedUser = updatedUsers.find((user) => user.username === currentUser.username)
+        setAuthState({ currentUser: updatedUser, isAuthReady: true })
+
+        return { ok: true, user: updatedUser }
       },
       signOut: () => {
         persistSession(null)

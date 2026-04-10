@@ -59,6 +59,37 @@ function SectionLabel({ title, helper }) {
   )
 }
 
+function getFallbackMatchDetails(match) {
+  return {
+    headline: `Preview of ${match.home.name} vs ${match.away.name}`,
+    recommendedBet: 'Review the matchup first',
+    confidence: 'Preview available',
+    homeForm: ['Recent form unavailable'],
+    awayForm: ['Recent form unavailable'],
+    stats: [
+      { label: 'Home team', value: `${match.home.name} vs ` },
+      { label: 'Away team', value: `${match.away.name} vs ` },
+      { label: 'Kickoff', value: match.kickoff || 'TBA' },
+    ],
+    standings: [
+      { team: match.home.name, points: '-', form: 'N/A' },
+      { team: match.away.name, points: '-', form: 'N/A' },
+    ],
+    teamDetails: [
+      { title: match.home.name, body: 'Team-level data not available for this preview.' },
+      { title: match.away.name, body: 'Team-level data not available for this preview.' },
+    ],
+    odds: [],
+    valueBets: [],
+    overUnder: [],
+    livePrediction: {
+      headline: 'No live prediction available for this fixture.',
+      recommendedBet: 'Monitor the match for updates',
+      confidence: 'N/A',
+    },
+  }
+}
+
 function LiveMatchDetails({ match, details }) {
   const statRows = details.stats.map((stat) => ({
     label: stat.label,
@@ -434,12 +465,8 @@ function MatchDetailsPage() {
 
   // Match details come from mockData.js for now.
   const liveDetails = liveMatchDetailsById[match.id]
-  const details = matchDetailsById[match.id]
+  const details = matchDetailsById[match.id] || getFallbackMatchDetails(match)
   const isLive = todayMatch?.status === 'Live' && Boolean(liveDetails)
-
-  if (!isLive && !details) {
-    return <Navigate to="/matches" replace />
-  }
 
   return (
     <div className="section-shell">

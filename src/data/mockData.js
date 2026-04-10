@@ -7,6 +7,7 @@ export const heroMetrics = [
 
 export const featuredMatches = [
   {
+    id: 'arsenal-newcastle',
     league: 'Premier League',
     kickoff: 'Today • 18:30 UTC',
     home: 'Arsenal',
@@ -16,6 +17,7 @@ export const featuredMatches = [
     value: '+6.2%',
   },
   {
+    id: 'sociedad-atletico',
     league: 'La Liga',
     kickoff: 'Today • 20:00 UTC',
     home: 'Real Sociedad',
@@ -25,6 +27,7 @@ export const featuredMatches = [
     value: '+4.1%',
   },
   {
+    id: 'atalanta-roma',
     league: 'Serie A',
     kickoff: 'Tomorrow • 19:45 UTC',
     home: 'Atalanta',
@@ -448,6 +451,23 @@ export const savedMatches = [
   'Arsenal vs Newcastle',
   'Juventus vs Lazio',
   'Barcelona vs Sevilla',
+]
+
+export const favoriteLeagues = [
+  'Premier League',
+  'La Liga',
+  'Serie A',
+  'Bundesliga',
+  'Ligue 1',
+]
+
+export const favoriteTeams = [
+  'Arsenal',
+  'Barcelona',
+  'Real Sociedad',
+  'Atalanta',
+  'PSG',
+  'Dortmund',
 ]
 
 export const adminCards = [
