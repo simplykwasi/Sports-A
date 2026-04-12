@@ -1,16 +1,96 @@
-# React + Vite
+# Sports A
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive sports match tracking and prediction app built with React and Vite. Features live match updates, league standings, search functionality, and personalized betting recommendations for registered users.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Live Match Tracking**: Real-time updates for ongoing matches across multiple leagues
+- **Match Predictions**: AI-powered predictions and betting recommendations (requires account)
+- **Search Functionality**: Quick search for teams, leagues, and matches
+- **User Authentication**: Sign up, sign in, and profile management
+- **Favorites**: Track your favorite teams and leagues
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **League Standings**: View current table positions and team forms
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React 18 with Vite
+- **Styling**: Tailwind CSS for responsive design
+- **Routing**: React Router for navigation
+- **State Management**: React Context for authentication
+- **Build Tool**: Vite for fast development and optimized builds
+- **Linting**: ESLint for code quality
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js (version 16 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd sports-a
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Run Linting
+
+```bash
+npm run lint
+```
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── layout/          # Layout components (Topbar, Sidebar, etc.)
+│   ├── matches/         # Match-related components
+│   └── ui/              # Reusable UI components
+├── context/             # React contexts (Auth)
+├── data/                # Mock data and navigation
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility libraries
+└── pages/               # Page components
+```
+
+## Authentication
+
+The app includes a simple authentication system with:
+- User registration and login
+- Persistent sessions using localStorage
+- Profile management
+- Privileged features for signed-in users (betting recommendations)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.

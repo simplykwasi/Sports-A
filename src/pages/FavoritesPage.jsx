@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import PageHero from '../components/ui/PageHero'
@@ -8,8 +8,8 @@ import { favoriteLeagues, favoriteTeams, featuredMatches, matchListings, todaysM
 // Favorites page.
 function FavoritesPage() {
   const { currentUser, hasAccount, updatePreferences } = useAuth()
-  const [selectedLeagues, setSelectedLeagues] = useState([])
-  const [selectedTeams, setSelectedTeams] = useState([])
+  const [selectedLeagues, setSelectedLeagues] = useState(() => currentUser?.favoriteLeagues || [])
+  const [selectedTeams, setSelectedTeams] = useState(() => currentUser?.favoriteTeams || [])
   const [searchTerm, setSearchTerm] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
 
@@ -26,13 +26,6 @@ function FavoritesPage() {
       favoriteTeams.filter((team) => team.toLowerCase().includes(searchTerm.trim().toLowerCase())),
     [searchTerm],
   )
-
-  useEffect(() => {
-    if (currentUser) {
-      setSelectedLeagues(currentUser.favoriteLeagues || [])
-      setSelectedTeams(currentUser.favoriteTeams || [])
-    }
-  }, [currentUser])
 
   const matchDetailsMap = useMemo(() => {
     const map = new Map()

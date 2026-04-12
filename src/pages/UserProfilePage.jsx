@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import PageHero from '../components/ui/PageHero'
@@ -7,17 +7,11 @@ import { useAuth } from '../hooks/useAuth'
 // User profile page.
 function UserProfilePage() {
   const { currentUser, hasAccount, updateProfile } = useAuth()
-  const [phoneNumber, setPhoneNumber] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState(() => currentUser?.phoneNumber || '')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
-
-  useEffect(() => {
-    if (currentUser) {
-      setPhoneNumber(currentUser.phoneNumber || '')
-    }
-  }, [currentUser])
 
   if (!hasAccount) {
     return (
