@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 
+import TeamCrest from '../components/ui/TeamCrest'
 import { todaysMatches } from '../data/mockData'
 
 // Home page welcome message for new and returning users.
@@ -46,11 +47,7 @@ function LandingPage() {
 
                   <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-3">
                     <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-                      <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-semibold sm:h-12 sm:w-12 sm:text-sm ${match.home.crestColor}`}
-                      >
-                        {match.home.shortName}
-                      </div>
+                      <TeamCrest team={match.home} size="md" />
                       <span className="truncate text-left text-xs font-semibold text-white sm:text-sm md:text-base">
                         {match.home.name}
                       </span>
@@ -66,11 +63,7 @@ function LandingPage() {
                       <span className="truncate text-right text-xs font-semibold text-white sm:text-sm md:text-base">
                         {match.away.name}
                       </span>
-                      <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-semibold sm:h-12 sm:w-12 sm:text-sm ${match.away.crestColor}`}
-                      >
-                        {match.away.shortName}
-                      </div>
+                      <TeamCrest team={match.away} size="md" />
                     </div>
                   </div>
                 </div>
@@ -106,11 +99,7 @@ function LandingPage() {
 
                     <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-3">
                       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-                        <div
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-semibold sm:h-12 sm:w-12 sm:text-sm ${match.home.crestColor}`}
-                        >
-                          {match.home.shortName}
-                        </div>
+                        <TeamCrest team={match.home} size="md" />
                         <span className="truncate text-left text-xs font-semibold text-white sm:text-sm md:text-base">
                           {match.home.name}
                         </span>
@@ -124,11 +113,7 @@ function LandingPage() {
                         <span className="truncate text-right text-xs font-semibold text-white sm:text-sm md:text-base">
                           {match.away.name}
                         </span>
-                        <div
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-semibold sm:h-12 sm:w-12 sm:text-sm ${match.away.crestColor}`}
-                        >
-                          {match.away.shortName}
-                        </div>
+                        <TeamCrest team={match.away} size="md" />
                       </div>
                     </div>
                   </div>

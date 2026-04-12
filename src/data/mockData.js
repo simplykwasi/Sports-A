@@ -56,48 +56,120 @@ export const matchListings = [
     league: 'Serie A',
     kickoff: 'Live - 68 mins',
     venue: 'San Siro',
-    home: { name: 'Inter', shortName: 'INT', crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20' },
-    away: { name: 'AC Milan', shortName: 'MIL', crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20' },
+    home: { 
+      name: 'Inter', 
+      shortName: 'INT', 
+      crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20',
+      crestUrl: 'https://crests.football-data.org/108.svg',
+      apiId: 108
+    },
+    away: { 
+      name: 'AC Milan', 
+      shortName: 'MIL', 
+      crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20',
+      crestUrl: 'https://crests.football-data.org/98.svg',
+      apiId: 98
+    },
   },
   {
     id: 'arsenal-newcastle',
     league: 'Premier League',
     kickoff: 'Today - 18:30 UTC',
     venue: 'Emirates Stadium',
-    home: { name: 'Arsenal', shortName: 'ARS', crestColor: 'bg-red-500/15 text-red-300 border-red-400/20' },
-    away: { name: 'Newcastle', shortName: 'NEW', crestColor: 'bg-slate-300/15 text-slate-200 border-slate-300/20' },
+    home: { 
+      name: 'Arsenal', 
+      shortName: 'ARS', 
+      crestColor: 'bg-red-500/15 text-red-300 border-red-400/20',
+      crestUrl: 'https://crests.football-data.org/57.svg',
+      apiId: 57
+    },
+    away: { 
+      name: 'Newcastle', 
+      shortName: 'NEW', 
+      crestColor: 'bg-slate-300/15 text-slate-200 border-slate-300/20',
+      crestUrl: 'https://crests.football-data.org/67.svg',
+      apiId: 67
+    },
   },
   {
     id: 'sociedad-atletico',
     league: 'La Liga',
     kickoff: 'Today - 20:00 UTC',
     venue: 'Reale Arena',
-    home: { name: 'Real Sociedad', shortName: 'RSO', crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20' },
-    away: { name: 'Atletico Madrid', shortName: 'ATM', crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20' },
+    home: { 
+      name: 'Real Sociedad', 
+      shortName: 'RSO', 
+      crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20',
+      crestUrl: 'https://crests.football-data.org/559.svg',
+      apiId: 559
+    },
+    away: { 
+      name: 'Atletico Madrid', 
+      shortName: 'ATM', 
+      crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20',
+      crestUrl: 'https://crests.football-data.org/78.svg',
+      apiId: 78
+    },
   },
   {
     id: 'atalanta-roma',
     league: 'Serie A',
     kickoff: 'Tomorrow - 19:45 UTC',
     venue: 'Gewiss Stadium',
-    home: { name: 'Atalanta', shortName: 'ATA', crestColor: 'bg-blue-500/15 text-blue-300 border-blue-400/20' },
-    away: { name: 'Roma', shortName: 'ROM', crestColor: 'bg-amber-500/15 text-amber-300 border-amber-400/20' },
+    home: { 
+      name: 'Atalanta', 
+      shortName: 'ATA', 
+      crestColor: 'bg-blue-500/15 text-blue-300 border-blue-400/20',
+      crestUrl: 'https://crests.football-data.org/102.svg',
+      apiId: 102
+    },
+    away: { 
+      name: 'Roma', 
+      shortName: 'ROM', 
+      crestColor: 'bg-amber-500/15 text-amber-300 border-amber-400/20',
+      crestUrl: 'https://crests.football-data.org/100.svg',
+      apiId: 100
+    },
   },
   {
     id: 'dortmund-leipzig',
     league: 'Bundesliga',
     kickoff: 'Tomorrow - 17:30 UTC',
     venue: 'Signal Iduna Park',
-    home: { name: 'Dortmund', shortName: 'BVB', crestColor: 'bg-yellow-400/15 text-yellow-200 border-yellow-300/20' },
-    away: { name: 'Leipzig', shortName: 'RBL', crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20' },
+    home: { 
+      name: 'Dortmund', 
+      shortName: 'BVB', 
+      crestColor: 'bg-yellow-400/15 text-yellow-200 border-yellow-300/20',
+      crestUrl: 'https://crests.football-data.org/4.svg',
+      apiId: 4
+    },
+    away: { 
+      name: 'Leipzig', 
+      shortName: 'RBL', 
+      crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20',
+      crestUrl: 'https://crests.football-data.org/721.svg',
+      apiId: 721
+    },
   },
   {
     id: 'psg-monaco',
     league: 'Ligue 1',
     kickoff: 'Live - 34 mins',
     venue: 'Parc des Princes',
-    home: { name: 'PSG', shortName: 'PSG', crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20' },
-    away: { name: 'Monaco', shortName: 'MON', crestColor: 'bg-amber-500/15 text-amber-300 border-amber-400/20' },
+    home: { 
+      name: 'PSG', 
+      shortName: 'PSG', 
+      crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20',
+      crestUrl: 'https://crests.football-data.org/524.svg',
+      apiId: 524
+    },
+    away: { 
+      name: 'Monaco', 
+      shortName: 'MON', 
+      crestColor: 'bg-amber-500/15 text-amber-300 border-amber-400/20',
+      crestUrl: 'https://crests.football-data.org/547.svg',
+      apiId: 547
+    },
   },
 ]
 
@@ -108,8 +180,20 @@ export const todaysMatches = [
     status: 'Live',
     minute: "68'",
     league: 'Serie A',
-    home: { name: 'Inter', shortName: 'INT', crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20' },
-    away: { name: 'AC Milan', shortName: 'MIL', crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20' },
+    home: { 
+      name: 'Inter', 
+      shortName: 'INT', 
+      crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20',
+      crestUrl: 'https://crests.football-data.org/108.svg',
+      apiId: 108
+    },
+    away: { 
+      name: 'AC Milan', 
+      shortName: 'MIL', 
+      crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20',
+      crestUrl: 'https://crests.football-data.org/98.svg',
+      apiId: 98
+    },
     score: '2 - 1',
   },
   {
@@ -117,24 +201,60 @@ export const todaysMatches = [
     status: 'Upcoming',
     kickoff: '18:30 UTC',
     league: 'Premier League',
-    home: { name: 'Arsenal', shortName: 'ARS', crestColor: 'bg-red-500/15 text-red-300 border-red-400/20' },
-    away: { name: 'Newcastle', shortName: 'NEW', crestColor: 'bg-slate-300/15 text-slate-200 border-slate-300/20' },
+    home: { 
+      name: 'Arsenal', 
+      shortName: 'ARS', 
+      crestColor: 'bg-red-500/15 text-red-300 border-red-400/20',
+      crestUrl: 'https://crests.football-data.org/57.svg',
+      apiId: 57
+    },
+    away: { 
+      name: 'Newcastle', 
+      shortName: 'NEW', 
+      crestColor: 'bg-slate-300/15 text-slate-200 border-slate-300/20',
+      crestUrl: 'https://crests.football-data.org/67.svg',
+      apiId: 67
+    },
   },
   {
     id: 'sociedad-atletico',
     status: 'Upcoming',
     kickoff: '20:00 UTC',
     league: 'La Liga',
-    home: { name: 'Real Sociedad', shortName: 'RSO', crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20' },
-    away: { name: 'Atletico Madrid', shortName: 'ATM', crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20' },
+    home: { 
+      name: 'Real Sociedad', 
+      shortName: 'RSO', 
+      crestColor: 'bg-sky-500/15 text-sky-300 border-sky-400/20',
+      crestUrl: 'https://crests.football-data.org/559.svg',
+      apiId: 559
+    },
+    away: { 
+      name: 'Atletico Madrid', 
+      shortName: 'ATM', 
+      crestColor: 'bg-rose-500/15 text-rose-300 border-rose-400/20',
+      crestUrl: 'https://crests.football-data.org/78.svg',
+      apiId: 78
+    },
   },
   {
     id: 'psg-monaco',
     status: 'Live',
     minute: "34'",
     league: 'Ligue 1',
-    home: { name: 'PSG', shortName: 'PSG', crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20' },
-    away: { name: 'Monaco', shortName: 'MON', crestColor: 'bg-amber-500/15 text-amber-300 border-amber-400/20' },
+    home: { 
+      name: 'PSG', 
+      shortName: 'PSG', 
+      crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20',
+      crestUrl: 'https://crests.football-data.org/524.svg',
+      apiId: 524
+    },
+    away: { 
+      name: 'Monaco', 
+      shortName: 'MON', 
+      crestColor: 'bg-amber-500/15 text-amber-300 border-amber-400/20',
+      crestUrl: 'https://crests.football-data.org/547.svg',
+      apiId: 547
+    },
     score: '1 - 0',
   },
   {
@@ -142,8 +262,20 @@ export const todaysMatches = [
     status: 'Upcoming',
     kickoff: '17:30 UTC',
     league: 'Bundesliga',
-    home: { name: 'Dortmund', shortName: 'BVB', crestColor: 'bg-yellow-400/15 text-yellow-200 border-yellow-300/20' },
-    away: { name: 'Leipzig', shortName: 'RBL', crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20' },
+    home: { 
+      name: 'Dortmund', 
+      shortName: 'BVB', 
+      crestColor: 'bg-yellow-400/15 text-yellow-200 border-yellow-300/20',
+      crestUrl: 'https://crests.football-data.org/4.svg',
+      apiId: 4
+    },
+    away: { 
+      name: 'Leipzig', 
+      shortName: 'RBL', 
+      crestColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/20',
+      crestUrl: 'https://crests.football-data.org/721.svg',
+      apiId: 721
+    },
   },
 ]
 

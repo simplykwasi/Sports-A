@@ -1,17 +1,12 @@
 import { Link } from 'react-router-dom'
 
+import TeamCrest from '../ui/TeamCrest'
+
 // Small team display used inside the match list card.
 function TeamPill({ team }) {
   return (
     <div className="flex items-center gap-3">
-      <div
-        className={[
-          'flex h-12 w-12 items-center justify-center rounded-full border font-display text-sm font-bold',
-          team.crestColor,
-        ].join(' ')}
-      >
-        {team.shortName}
-      </div>
+      <TeamCrest team={team} size="md" />
       <p className="font-display text-lg font-semibold text-white">{team.name}</p>
     </div>
   )

@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 
 import PageHero from '../components/ui/PageHero'
+import TeamCrest from '../components/ui/TeamCrest'
 import { liveMatchDetailsById, matchDetailsById, matchListings, todaysMatches } from '../data/mockData'
 import { useAuth } from '../hooks/useAuth'
 
@@ -20,25 +21,11 @@ function TeamHeader({ team, side }) {
             </p>
             <p className="text-xs text-slate-300 sm:text-sm">{team.shortName}</p>
           </div>
-          <div
-            className={[
-              'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border font-display text-xs font-bold sm:h-14 sm:w-14 sm:text-sm',
-              team.crestColor,
-            ].join(' ')}
-          >
-            {team.shortName}
-          </div>
+          <TeamCrest team={team} size="lg" />
         </>
       ) : (
         <>
-          <div
-            className={[
-              'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border font-display text-xs font-bold sm:h-14 sm:w-14 sm:text-sm',
-              team.crestColor,
-            ].join(' ')}
-          >
-            {team.shortName}
-          </div>
+          <TeamCrest team={team} size="lg" />
           <div className="min-w-0">
             <p className="truncate font-display text-base font-bold text-white sm:text-xl md:text-2xl">
               {team.name}
