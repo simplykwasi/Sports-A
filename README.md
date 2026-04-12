@@ -60,6 +60,32 @@ npm run build
 npm run lint
 ```
 
+## Deployment
+
+### Static Hosting
+
+The app can be deployed to any static hosting service:
+
+- **Vercel**: Connect your GitHub repo and deploy automatically
+- **Netlify**: Drag & drop the `dist` folder or connect via Git
+- **GitHub Pages**: Use GitHub Actions for automated deployment
+- **AWS S3 + CloudFront**: For scalable static hosting
+
+### Environment Variables
+
+Create a `.env` file for environment-specific configuration:
+
+```env
+VITE_API_URL=https://api.sports-a.com
+VITE_APP_ENV=production
+```
+
+### Performance Features
+
+- **Code Splitting**: Pages are lazy-loaded for faster initial load
+- **Optimized Bundles**: Vite automatically optimizes and minifies code
+- **PWA Ready**: Includes web app manifest for installable experience
+
 ## Project Structure
 
 ```

@@ -9,6 +9,7 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 }
+// eslint-disable-next-line no-undef
 global.localStorage = localStorageMock
 
 // Test component that uses auth

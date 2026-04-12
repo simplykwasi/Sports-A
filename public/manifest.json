@@ -1,0 +1,20 @@
+{
+  "name": "Sports A",
+  "short_name": "Sports A",
+  "description": "Live sports tracking, predictions, and betting recommendations",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "categories": ["sports", "entertainment"],
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
