@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import TeamCrest from '../ui/TeamCrest'
+import LeagueCrest from '../ui/LeagueCrest'
 
 // Small team display used inside the match list card.
 function TeamPill({ team }) {
@@ -21,9 +22,14 @@ function MatchListCard({ match }) {
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300">
-            {match.league}
-          </p>
+          <div className="flex items-center gap-2">
+            <div className="flex-shrink-0">
+              <LeagueCrest league={match.league} size="sm" />
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300">
+              {match.league}
+            </p>
+          </div>
           <p className="mt-2 text-sm text-slate-300">
             {match.kickoff} · {match.venue}
           </p>

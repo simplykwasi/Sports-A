@@ -4,9 +4,15 @@ function PageHero({ eyebrow, title, description, actions }) {
     <section className="glass-panel overflow-hidden p-6 md:p-8">
       <div className="section-shell">
         <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-300">
-            {eyebrow}
-          </p>
+          {typeof eyebrow === 'string' ? (
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-300">
+              {eyebrow}
+            </p>
+          ) : (
+            <div className="flex items-center gap-2">
+              {eyebrow}
+            </div>
+          )}
           <h2 className="page-title">{title}</h2>
           <p className="page-subtitle">{description}</p>
         </div>

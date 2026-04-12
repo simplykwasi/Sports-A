@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import DataTable from '../components/ui/DataTable'
+import LeagueCrest from '../components/ui/LeagueCrest'
 
 const topLeagues = [
   'Premier League',
@@ -83,12 +84,15 @@ function LeagueStandingsPage() {
               type="button"
               onClick={() => setActiveLeague(league)}
               className={[
-                'whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition',
+                'flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition',
                 activeLeague === league
                   ? 'bg-brand-400 text-ink-950'
                   : 'border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10',
               ].join(' ')}
             >
+              <div className="flex-shrink-0">
+                <LeagueCrest league={league} size="sm" />
+              </div>
               {league}
             </button>
           ))}

@@ -2,6 +2,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 
 import PageHero from '../components/ui/PageHero'
 import TeamCrest from '../components/ui/TeamCrest'
+import LeagueCrest from '../components/ui/LeagueCrest'
 import { liveMatchDetailsById, matchDetailsById, matchListings, todaysMatches } from '../data/mockData'
 import { useAuth } from '../hooks/useAuth'
 
@@ -161,7 +162,12 @@ function LiveMatchDetails({ match, details, hasAccount }) {
           </div>
           <div className="border border-white/8 bg-slate-950/40 p-3">
             <p className="text-xs uppercase tracking-[0.18em] text-slate-400">League</p>
-            <p className="mt-2 font-semibold text-white">{match.league}</p>
+            <div className="mt-2 flex items-center gap-2">
+              <div className="flex-shrink-0">
+                <LeagueCrest league={match.league} size="sm" />
+              </div>
+              <p className="font-semibold text-white">{match.league}</p>
+            </div>
           </div>
           <div className="border border-white/8 bg-slate-950/40 p-3">
             <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Location</p>
@@ -488,7 +494,16 @@ function MatchDetailsPage() {
       </div>
 
       <PageHero
-        eyebrow={match.league}
+        eyebrow={
+          <div className="flex items-center gap-2">
+            <div className="flex-shrink-0">
+              <LeagueCrest league={match.league} size="sm" />
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-300">
+              {match.league}
+            </p>
+          </div>
+        }
         title={`${match.home.name} vs ${match.away.name}`}
         description={
           isLive

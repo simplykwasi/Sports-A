@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import PageHero from '../components/ui/PageHero'
+import LeagueCrest from '../components/ui/LeagueCrest'
 import { useAuth } from '../hooks/useAuth'
 import { favoriteLeagues, favoriteTeams, featuredMatches, matchListings, todaysMatches } from '../data/mockData'
 
@@ -308,7 +309,12 @@ function FavoritesPage() {
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
                       <div>
-                        <p className="text-xs uppercase tracking-[0.22em] text-slate-400">{match.league}</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-shrink-0">
+                            <LeagueCrest league={match.league} size="sm" />
+                          </div>
+                          <p className="text-xs uppercase tracking-[0.22em] text-slate-400">{match.league}</p>
+                        </div>
                         <h3 className="mt-3 text-xl font-semibold text-white">{match.home} vs {match.away}</h3>
                         <p className="mt-2 text-sm text-slate-300">
                           {details.venue ? `${details.venue} · ` : ''}{timeLabel}
