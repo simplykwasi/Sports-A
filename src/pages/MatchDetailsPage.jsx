@@ -2,6 +2,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 
 import PageHero from '../components/ui/PageHero'
 import { liveMatchDetailsById, matchDetailsById, matchListings, todaysMatches } from '../data/mockData'
+import { useAuth } from '../hooks/useAuth'
 
 function TeamHeader({ team, side }) {
   return (
@@ -90,7 +91,7 @@ function getFallbackMatchDetails(match) {
   }
 }
 
-function LiveMatchDetails({ match, details }) {
+function LiveMatchDetails({ match, details, hasAccount }) {
   const statRows = details.stats.map((stat) => ({
     label: stat.label,
     leftValue: stat.home,
@@ -243,33 +244,44 @@ function LiveMatchDetails({ match, details }) {
       </div>
 
       {/* Edit the live prediction block here. */}
-      <div className="grid gap-4 pt-5 sm:pt-6 xl:grid-cols-[1.2fr_0.8fr] xl:items-center">
-        <div>
+      {hasAccount ? (
+        <div className="grid gap-4 pt-5 sm:pt-6 xl:grid-cols-[1.2fr_0.8fr] xl:items-center">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">
+              Live prediction
+            </p>
+            <p className="mt-3 text-sm leading-7 text-slate-200">{details.livePrediction.headline}</p>
+            <p className="mt-3 text-sm text-slate-400">{details.livePrediction.note}</p>
+          </div>
+
+          <div className="border border-brand-300/20 bg-brand-400/10 p-4">
+            <p className="text-xs uppercase tracking-[0.22em] text-brand-300">
+              Likely result / live bet
+            </p>
+            <p className="mt-3 font-display text-2xl font-bold text-white">
+              {details.livePrediction.likelyWinner}
+            </p>
+            <p className="mt-2 text-sm text-slate-300">{details.livePrediction.confidence}</p>
+            <p className="mt-3 text-sm font-semibold text-white">
+              Recommended bet: {details.livePrediction.recommendedBet}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="pt-5 sm:pt-6">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">
             Live prediction
           </p>
-          <p className="mt-3 text-sm leading-7 text-slate-200">{details.livePrediction.headline}</p>
-          <p className="mt-3 text-sm text-slate-400">{details.livePrediction.note}</p>
-        </div>
-
-        <div className="border border-brand-300/20 bg-brand-400/10 p-4">
-          <p className="text-xs uppercase tracking-[0.22em] text-brand-300">
-            Likely result / live bet
-          </p>
-          <p className="mt-3 font-display text-2xl font-bold text-white">
-            {details.livePrediction.likelyWinner}
-          </p>
-          <p className="mt-2 text-sm text-slate-300">{details.livePrediction.confidence}</p>
-          <p className="mt-3 text-sm font-semibold text-white">
-            Recommended bet: {details.livePrediction.recommendedBet}
+          <p className="mt-3 text-sm leading-7 text-slate-200">
+            Sign in to access live betting recommendations and predictions.
           </p>
         </div>
-      </div>
+      )}
     </section>
   )
 }
 
-function PreMatchDetails({ match, details }) {
+function PreMatchDetails({ match, details, hasAccount }) {
   const statRows = details.stats.map((stat) => {
     const [leftValue, rightValue] = stat.value.includes(' vs ')
       ? stat.value.split(' vs ')
@@ -432,28 +444,40 @@ function PreMatchDetails({ match, details }) {
         </div>
       </div>
 
-      <div className="grid gap-4 pt-5 sm:pt-6 xl:grid-cols-[1.2fr_0.8fr] xl:items-center">
-        <div>
+      {hasAccount ? (
+        <div className="grid gap-4 pt-5 sm:pt-6 xl:grid-cols-[1.2fr_0.8fr] xl:items-center">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">
+              System summary
+            </p>
+            <p className="mt-3 text-sm leading-7 text-slate-200">{details.headline}</p>
+          </div>
+
+          <div className="border border-brand-300/20 bg-brand-400/10 p-4">
+            <p className="text-xs uppercase tracking-[0.22em] text-brand-300">
+              Likely winner / best pick
+            </p>
+            <p className="mt-3 font-display text-2xl font-bold text-white">{details.recommendedBet}</p>
+            <p className="mt-2 text-sm text-slate-300">{details.confidence}</p>
+          </div>
+        </div>
+      ) : (
+        <div className="pt-5 sm:pt-6">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-300">
             System summary
           </p>
-          <p className="mt-3 text-sm leading-7 text-slate-200">{details.headline}</p>
-        </div>
-
-        <div className="border border-brand-300/20 bg-brand-400/10 p-4">
-          <p className="text-xs uppercase tracking-[0.22em] text-brand-300">
-            Likely winner / best pick
+          <p className="mt-3 text-sm leading-7 text-slate-200">
+            Sign in to access betting recommendations and system picks.
           </p>
-          <p className="mt-3 font-display text-2xl font-bold text-white">{details.recommendedBet}</p>
-          <p className="mt-2 text-sm text-slate-300">{details.confidence}</p>
         </div>
-      </div>
+      )}
     </section>
   )
 }
 
 function MatchDetailsPage() {
   const { matchId } = useParams()
+  const { hasAccount } = useAuth()
 
   // Edit route-level match lookup here if the source of fixtures changes later.
   const match = matchListings.find((item) => item.id === matchId)
@@ -487,9 +511,9 @@ function MatchDetailsPage() {
       />
 
       {isLive ? (
-        <LiveMatchDetails match={match} details={liveDetails} />
+        <LiveMatchDetails match={match} details={liveDetails} hasAccount={hasAccount} />
       ) : (
-        <PreMatchDetails match={match} details={details} />
+        <PreMatchDetails match={match} details={details} hasAccount={hasAccount} />
       )}
     </div>
   )

@@ -1,10 +1,21 @@
 import { NavLink } from 'react-router-dom'
-import { FiX } from 'react-icons/fi'
+import { FiBell, FiBookmark, FiSettings, FiUser, FiX } from 'react-icons/fi'
+import { useAuth } from '../../hooks/useAuth'
 import { navigationGroups } from '../../data/navigation'
 import BrandLogo from '../ui/BrandLogo'
 
 // Main sidebar with desktop rail behavior and mobile drawer behavior.
 function Sidebar({ isMobileOpen = false, onClose }) {
+  const { hasAccount } = useAuth()
+  const accountLinks = hasAccount
+    ? [
+        { label: 'Profile', to: '/profile', icon: FiUser },
+        { label: 'Notifications', to: '/notifications', icon: FiBell },
+        { label: 'Favorites', to: '/favorites', icon: FiBookmark },
+        { label: 'Settings', to: '/settings', icon: FiSettings },
+      ]
+    : []
+
   return (
     <>
       {/* Mobile/tablet overlay behind the drawer */}
@@ -20,7 +31,7 @@ function Sidebar({ isMobileOpen = false, onClose }) {
 
       <aside
         className={[
-          'sidebar-shell fixed inset-y-0 left-0 z-40 flex h-screen w-[300px] max-w-[85vw] flex-col border-r border-white/10 bg-ink-950/95 px-3 py-4 backdrop-blur transition-transform duration-200 md:px-4 md:py-5 xl:sticky xl:top-0 xl:h-screen xl:w-auto xl:max-w-none xl:translate-x-0 xl:self-start xl:border-b-0',
+          'sidebar-shell fixed inset-y-0 left-0 z-40 flex h-screen w-75 max-w-[85vw] flex-col border-r border-white/10 bg-ink-950/95 px-3 py-4 backdrop-blur transition-transform duration-200 md:px-4 md:py-5 xl:sticky xl:top-0 xl:h-screen xl:w-auto xl:max-w-none xl:translate-x-0 xl:self-start xl:border-b-0',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full',
         ].join(' ')}
       >
@@ -81,6 +92,38 @@ function Sidebar({ isMobileOpen = false, onClose }) {
               </div>
             </section>
           ))}
+
+          {accountLinks.length > 0 ? (
+            <section>
+              <p className="sidebar-copy mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
+                Account
+              </p>
+              <div className="grid gap-2">
+                {accountLinks.map((link) => {
+                  const Icon = link.icon
+
+                  return (
+                    <NavLink
+                      key={link.to}
+                      to={link.to}
+                      onClick={onClose}
+                      className={({ isActive }) =>
+                        [
+                          'sidebar-link flex items-center gap-3 rounded-2xl px-3 py-3 text-sm transition',
+                          isActive
+                            ? 'bg-brand-400 text-ink-950'
+                            : 'bg-white/0 text-slate-200 hover:bg-white/6',
+                        ].join(' ')
+                      }
+                    >
+                      <Icon className="sidebar-icon shrink-0 text-base" />
+                      <span className="sidebar-copy">{link.label}</span>
+                    </NavLink>
+                  )
+                })}
+              </div>
+            </section>
+          ) : null}
         </div>
       </aside>
     </>

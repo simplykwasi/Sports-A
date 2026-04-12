@@ -8,7 +8,7 @@ function LandingPage() {
   const upcomingMatches = todaysMatches.filter((match) => match.status !== 'Live')
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-3 pt-8 pb-8 sm:px-4 sm:pt-10 md:px-6 md:pt-14 md:pb-10">
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-5 sm:py-10 md:px-6 md:py-12">
       <div className="space-y-8 md:space-y-10">
         {/* Edit the main Home page message here. */}
         <section className="mx-auto max-w-3xl space-y-3 px-2 text-center sm:space-y-4">
@@ -44,7 +44,7 @@ function LandingPage() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-3">
+                  <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-3">
                     <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                       <div
                         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-semibold sm:h-12 sm:w-12 sm:text-sm ${match.home.crestColor}`}
@@ -104,7 +104,7 @@ function LandingPage() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-3">
+                    <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-3">
                       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                         <div
                           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-semibold sm:h-12 sm:w-12 sm:text-sm ${match.home.crestColor}`}

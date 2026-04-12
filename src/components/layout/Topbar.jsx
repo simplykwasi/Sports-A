@@ -1,14 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
-  FiBell,
-  FiBookmark,
   FiChevronDown,
   FiLogOut,
   FiMenu,
   FiSearch,
-  FiSettings,
-  FiShield,
   FiUser,
   FiUserPlus,
   FiX,
@@ -17,14 +13,6 @@ import { useAuth } from '../../hooks/useAuth'
 import { navigationGroups } from '../../data/navigation'
 import { matchListings } from '../../data/mockData'
 import BrandLogo from '../ui/BrandLogo'
-
-const signedInMenuLinks = [
-  { label: 'Profile', to: '/profile', icon: FiUser },
-  { label: 'Notifications', to: '/notifications', icon: FiBell },
-  { label: 'Favorites', to: '/favorites', icon: FiBookmark },
-  { label: 'Settings', to: '/settings', icon: FiSettings },
-  { label: 'Admin Panel', to: '/admin', icon: FiShield },
-]
 
 // Top navigation bar shared across the app layout.
 function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
@@ -35,51 +23,11 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
   const searchRef = useRef(null)
   const { currentUser, hasAccount, signOut } = useAuth()
 
-  const quickSearchItems = useMemo(() => {
-    const routeItems = navigationGroups.flatMap((group) =>
-      group.links.map((link) => ({
-        id: `route-${link.to}`,
-        title: link.label,
-        helper: 'Page',
-        to: link.to,
-      })),
-    )
-
-    const accountItems = signedInMenuLinks.map((link) => ({
-      id: `account-${link.to}`,
-      title: link.label,
-      helper: 'Account',
-      to: link.to,
-    }))
-
-    const matchItems = matchListings.map((match) => ({
-      id: `match-${match.id}`,
-      title: `${match.home.name} vs ${match.away.name}`,
-      helper: `${match.league} • ${match.kickoff}`,
-      to: `/matches/${match.id}`,
-    }))
-
-    return [...routeItems, ...accountItems, ...matchItems]
-  }, [])
-
-  const filteredSearchItems = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase()
-
-    if (!query) {
-      return quickSearchItems.slice(0, 6)
-    }
-
-    return quickSearchItems
-      .filter((item) => `${item.title} ${item.helper}`.toLowerCase().includes(query))
-      .slice(0, 8)
-  }, [quickSearchItems, searchQuery])
-
   useEffect(() => {
     const handlePointerDown = (event) => {
       if (!profileMenuRef.current?.contains(event.target)) {
         setIsProfileOpen(false)
       }
-
       if (!searchRef.current?.contains(event.target)) {
         setIsSearchOpen(false)
       }
@@ -97,19 +45,74 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
     setIsProfileOpen(false)
   }
 
+  const navigate = useNavigate()
+
+  const searchItems = useMemo(() => {
+    const pageLinks = navigationGroups.flatMap((group) =>
+      group.links.map((link) => ({
+        id: `page-${link.to}`,
+        title: link.label,
+        helper: 'Page',
+        to: link.to,
+      })),
+    )
+
+    const accountLinks = hasAccount
+      ? [
+          { id: 'account-profile', title: 'Profile', helper: 'Account', to: '/profile' },
+          { id: 'account-notifications', title: 'Notifications', helper: 'Account', to: '/notifications' },
+          { id: 'account-favorites', title: 'Favorites', helper: 'Account', to: '/favorites' },
+          { id: 'account-settings', title: 'Settings', helper: 'Account', to: '/settings' },
+        ]
+      : []
+
+    const matchLinks = matchListings.map((match) => ({
+      id: `match-${match.id}`,
+      title: `${match.home.name} vs ${match.away.name}`,
+      helper: `${match.league}`,
+      to: `/matches/${match.id}`,
+    }))
+
+    return [...pageLinks, ...accountLinks, ...matchLinks]
+  }, [hasAccount])
+
+  const filteredSearchItems = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) {
+      return []
+    }
+
+    return searchItems.filter((item) =>
+      `${item.title} ${item.helper}`.toLowerCase().includes(query),
+    )
+  }, [searchItems, searchQuery])
+
   const handleSearchToggle = () => {
     setIsProfileOpen(false)
     setIsSearchOpen((current) => !current)
   }
 
+  const handleSearchKeyDown = (event) => {
+    if (event.key !== 'Enter') {
+      return
+    }
+
+    const firstResult = filteredSearchItems[0]
+    if (firstResult) {
+      event.preventDefault()
+      navigate(firstResult.to)
+      setIsSearchOpen(false)
+      setSearchQuery('')
+    }
+  }
+
   return (
-    <header className="sticky top-0 z-10 border-b border-white/10 bg-ink-950/70 px-3 py-3 backdrop-blur md:px-6 md:py-4 xl:px-8">
-      <div className="flex items-center justify-between gap-3">
-        {/* Left side: mobile menu button + brand */}
-        <div className="flex min-w-0 items-center gap-2 md:gap-3">
+    <header className="sticky top-0 z-20 w-full border-b border-white/10 bg-ink-950/95 px-3 py-3 backdrop-blur transition-colors duration-200 sm:px-4 md:px-6">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            className="secondary-button h-10 w-10 shrink-0 rounded-full p-0 md:h-12 md:w-12 xl:hidden"
+            className="secondary-button h-10 w-10 rounded-full p-0 text-white transition hover:bg-white/10 xl:hidden"
             aria-label={isMobileSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
             aria-expanded={isMobileSidebarOpen}
             onClick={onMenuToggle}
@@ -121,18 +124,17 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
             size="sm"
             className="min-w-0"
             wordmarkClassName="min-w-0"
-            titleClassName="truncate text-lg md:text-2xl"
-            subtitleClassName="hidden md:block"
+            titleClassName="truncate text-lg font-semibold text-white md:text-xl"
+            subtitleClassName="hidden text-sm text-slate-400 md:block"
           />
         </div>
 
-        {/* Right side: profile actions */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <div ref={searchRef} className="relative flex items-center">
+        <div className="flex flex-1 items-center justify-end gap-2">
+          <div ref={searchRef} className="relative w-full max-w-xs min-w-0 md:w-auto">
             <button
               type="button"
               onClick={handleSearchToggle}
-              className="secondary-button flex h-10 w-10 items-center justify-center rounded-full p-0 md:h-12 md:w-12"
+              className="secondary-button flex h-10 w-10 items-center justify-center rounded-full p-0 transition hover:bg-white/10 md:h-11 md:w-11"
               aria-label={isSearchOpen ? 'Close search' : 'Open search'}
               aria-expanded={isSearchOpen}
             >
@@ -141,35 +143,34 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
 
             <div
               className={[
-                'absolute right-0 top-[calc(100%+0.75rem)] w-[min(22rem,88vw)] origin-top-right rounded-3xl border border-white/10 bg-ink-950/95 p-3 shadow-2xl backdrop-blur transition-all duration-200',
-                isSearchOpen
-                  ? 'pointer-events-auto translate-y-0 scale-100 opacity-100'
-                  : 'pointer-events-none -translate-y-2 scale-95 opacity-0',
+                'absolute left-0 right-0 z-50 mt-2 w-full origin-top rounded-3xl border border-white/10 bg-ink-950/95 p-3 shadow-2xl backdrop-blur transition-all duration-150',
+                'md:left-auto md:right-0 md:w-88',
+                isSearchOpen ? 'opacity-100 scale-100' : 'pointer-events-none opacity-0 scale-95',
               ].join(' ')}
             >
-              {/* Edit the temporary quick-search experience here. */}
               <label className="sr-only" htmlFor="header-search">
                 Search
               </label>
-              <div className="flex h-11 items-center gap-2 rounded-full border border-brand-300/20 bg-white/8 px-3">
-                <FiSearch className="shrink-0 text-slate-300" />
+              <div className="flex h-11 items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3">
+                <FiSearch className="text-slate-300" />
                 <input
                   id="header-search"
                   type="search"
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
+                  onKeyDown={handleSearchKeyDown}
                   placeholder="Search matches, teams, leagues..."
                   className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-400"
                 />
               </div>
 
               <div className="mt-3 space-y-2">
-                <p className="px-2 text-[10px] uppercase tracking-[0.2em] text-slate-400">
-                  Quick results
-                </p>
-
-                {filteredSearchItems.length ? (
-                  <div className="grid gap-2">
+                {searchQuery.trim() === '' ? (
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
+                    Type a team, league, or page name to search.
+                  </div>
+                ) : filteredSearchItems.length > 0 ? (
+                  <div className="grid gap-2 max-h-72 overflow-y-auto">
                     {filteredSearchItems.map((item) => (
                       <Link
                         key={item.id}
@@ -187,7 +188,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
                   </div>
                 ) : (
                   <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
-                    No quick result found yet.
+                    No results found for "{searchQuery.trim()}".
                   </div>
                 )}
               </div>
@@ -197,7 +198,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
           <div className="relative" ref={profileMenuRef}>
             <button
               type="button"
-              className="secondary-button flex h-10 items-center gap-2 rounded-full px-3 md:h-12 md:px-4"
+              className="secondary-button flex h-10 items-center gap-2 rounded-full px-3 transition hover:bg-white/10 md:h-11"
               aria-label="User profile menu"
               aria-expanded={isProfileOpen}
               onClick={() => setIsProfileOpen((current) => !current)}
@@ -206,15 +207,15 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
                 <FiUser />
               </span>
               {hasAccount ? (
-                <span className="hidden max-w-32 truncate text-sm text-white sm:block">
+                <span className="hidden truncate text-sm text-white sm:block">
                   {currentUser.username}
                 </span>
               ) : null}
-              <FiChevronDown className="text-sm text-slate-300" />
+              <FiChevronDown className={`text-sm text-slate-300 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isProfileOpen ? (
-              <div className="absolute right-0 mt-3 w-56 rounded-3xl border border-white/10 bg-ink-950/95 p-3 shadow-2xl backdrop-blur">
+              <div className="absolute right-0 mt-2 min-w-55 rounded-3xl border border-white/10 bg-ink-950/95 p-3 shadow-2xl backdrop-blur">
                 {hasAccount ? (
                   <div className="space-y-3">
                     <div className="border-b border-white/8 pb-3">
@@ -226,24 +227,6 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
                       >
                         {currentUser.username}
                       </Link>
-                    </div>
-
-                    <div className="grid gap-2">
-                      {signedInMenuLinks.map((link) => {
-                        const Icon = link.icon
-
-                        return (
-                          <Link
-                            key={link.to}
-                            to={link.to}
-                            onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-                          >
-                            <Icon />
-                            {link.label}
-                          </Link>
-                        )
-                      })}
                     </div>
 
                     <button
