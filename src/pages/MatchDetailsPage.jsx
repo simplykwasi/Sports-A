@@ -163,7 +163,7 @@ function LiveMatchDetails({ match, details, hasAccount }) {
           <div className="border border-white/8 bg-slate-950/40 p-3">
             <p className="text-xs uppercase tracking-[0.18em] text-slate-400">League</p>
             <div className="mt-2 flex items-center gap-2">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <LeagueCrest league={match.league} size="sm" />
               </div>
               <p className="font-semibold text-white">{match.league}</p>
@@ -496,7 +496,7 @@ function MatchDetailsPage() {
       <PageHero
         eyebrow={
           <div className="flex items-center gap-2">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <LeagueCrest league={match.league} size="sm" />
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-300">

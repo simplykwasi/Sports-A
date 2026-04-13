@@ -90,7 +90,7 @@ function LeagueStandingsPage() {
                   : 'border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10',
               ].join(' ')}
             >
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <LeagueCrest league={league} size="sm" />
               </div>
               {league}

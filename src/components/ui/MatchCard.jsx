@@ -6,7 +6,7 @@ function MatchCard({ match }) {
     <article className="glass-panel p-5">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.22em] text-slate-400">
         <div className="flex items-center gap-2">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <LeagueCrest league={match.league} size="sm" />
           </div>
           <span>{match.league}</span>

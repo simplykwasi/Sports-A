@@ -41,7 +41,7 @@ function LandingPage() {
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex flex-col gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:text-xs sm:tracking-[0.2em]">
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <LeagueCrest league={match.league} size="sm" className="flex-shrink-0" />
+                      <LeagueCrest league={match.league} size="sm" className="shrink-0" />
                       <span className="truncate">{match.league}</span>
                     </div>
                     <span className="inline-flex w-fit rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-emerald-300">
@@ -96,7 +96,7 @@ function LandingPage() {
                   <div className="space-y-3 sm:space-y-4">
                     <div className="flex flex-col gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:text-xs sm:tracking-[0.2em]">
                       <div className="flex items-center gap-2 sm:gap-3">
-                        <LeagueCrest league={match.league} size="sm" className="flex-shrink-0" />
+                        <LeagueCrest league={match.league} size="sm" className="shrink-0" />
                         <span className="truncate">{match.league}</span>
                       </div>
                       <span className="inline-flex w-fit rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-sky-300">

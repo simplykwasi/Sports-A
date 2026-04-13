@@ -23,7 +23,7 @@ function MatchListCard({ match }) {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <LeagueCrest league={match.league} size="sm" />
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300">

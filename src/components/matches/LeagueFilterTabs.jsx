@@ -17,7 +17,7 @@ function LeagueFilterTabs({ leagues, activeLeague, onSelect }) {
           ].join(' ')}
         >
           {league !== 'All leagues' && league !== 'Live' && (
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <LeagueCrest league={league} size="sm" />
             </div>
           )}
