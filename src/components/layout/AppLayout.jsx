@@ -1,30 +1,24 @@
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
-import Sidebar from './Sidebar'
-import Topbar from './Topbar'
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Sidebar from './Sidebar'; // Assuming you have a Sidebar component
+import Header from './Header'; // Assuming you have a Header component
 
-// Main app frame: sidebar, topbar, and page outlet.
+/**
+ * AppLayout component provides a consistent layout with a fixed sidebar and header.
+ * It renders the main content of the application via the Outlet.
+ */
 function AppLayout() {
-  // Controls the off-canvas sidebar on mobile and tablet screens.
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-
   return (
-    <div className="app-shell min-h-screen xl:grid">
-      <Sidebar
-        isMobileOpen={isMobileSidebarOpen}
-        onClose={() => setIsMobileSidebarOpen(false)}
-      />
-      <div className="min-w-0">
-        <Topbar
-          isMobileSidebarOpen={isMobileSidebarOpen}
-          onMenuToggle={() => setIsMobileSidebarOpen((open) => !open)}
-        />
-        <main className="px-4 pb-8 pt-6 md:px-6 xl:px-8">
-          <Outlet />
+    <div className="flex min-h-screen bg-ink-950 text-slate-100">
+      <Sidebar /> {/* Fixed sidebar */}
+      <div className="flex-1 flex flex-col">
+        <Header /> {/* Fixed top header */}
+        <main className="flex-1 p-6 overflow-y-auto">
+          <Outlet /> {/* Renders the current route's component */}
         </main>
       </div>
     </div>
-  )
+  );
 }
 
-export default AppLayout
+export default AppLayout;

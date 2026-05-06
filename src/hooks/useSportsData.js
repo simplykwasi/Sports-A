@@ -20,42 +20,14 @@ export function useSportsData(options = {}) {
    * Detect value bets where AI probability > bookmaker implied probability by >= 5%
    */
   const detectValueBets = useCallback((fixturesWithPredictions) => {
-    return fixturesWithPredictions
-      .filter((fixture) => {
-        if (!fixture.predictions) return false;
-
-        const pred = fixture.predictions;
-        const bookyProb = {
-          home: pred.bookie_home_prob || 0,
-          draw: pred.bookie_draw_prob || 0,
-          away: pred.bookie_away_prob || 0,
-        };
-
-        const aiProb = {
-          home: pred.predicted_home_prob || 0,
-          draw: pred.predicted_draw_prob || 0,
-          away: pred.predicted_away_prob || 0,
-        };
-
-        const deltas = {
-          home: aiProb.home - bookyProb.home,
-          draw: aiProb.draw - bookyProb.draw,
-          away: aiProb.away - bookyProb.away,
-        };
-
-        return Object.values(deltas).some((delta) => Math.abs(delta) >= 0.05);
-      })
+    return fixturesWithPredictions.filter((fixture) => fixture.predictions?.value_flag)
       .map((fixture) => ({
         fixtureId: fixture.fixture_id,
         homeTeam: fixture.home_team,
         awayTeam: fixture.away_team,
         kickoff: fixture.kickoff_time,
-        predictions: fixture.predictions,
-        valueDelta: Math.max(
-          Math.abs(fixture.predictions.predicted_home_prob - fixture.predictions.bookie_home_prob),
-          Math.abs(fixture.predictions.predicted_draw_prob - fixture.predictions.bookie_draw_prob),
-          Math.abs(fixture.predictions.predicted_away_prob - fixture.predictions.bookie_away_prob)
-        ),
+        predictions: fixture.predictions, // Contains value_flag and value_delta from backend
+        valueDelta: fixture.predictions.value_delta,
       }));
   }, []);
 

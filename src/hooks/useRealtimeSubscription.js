@@ -83,7 +83,7 @@ export function useRealtimeSubscription(tableName, options = {}) {
 /**
  * Specialized hook for live match updates
  */
-export function useliveLiveMatchUpdates(fixtureId) {
+export function useLiveMatchUpdates(fixtureId) {
   const [liveEvents, setLiveEvents] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState(null);
