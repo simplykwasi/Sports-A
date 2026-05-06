@@ -20,6 +20,8 @@ A modern, responsive sports match tracking and prediction app built with React a
 - **State Management**: React Context for authentication
 - **Build Tool**: Vite for fast development and optimized builds
 - **Linting**: ESLint for code quality
+- **Backend**: Node.js + Express, JWT auth, Redis caching, Supabase/PostgreSQL
+- **Realtime**: WebSockets for live analytics and value detection
 
 ## Getting Started
 
@@ -59,6 +61,37 @@ npm run build
 ```bash
 npm run lint
 ```
+
+## Backend Development
+
+The backend lives in `backend/` and is designed for Supabase/PostgreSQL, live analytics, and value bet detection.
+
+1. Change directory into the backend folder:
+   ```bash
+   cd backend
+   ```
+2. Install backend dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` from `.env.example` and configure Supabase, Redis, and API-Football credentials.
+4. Run database migrations:
+   ```bash
+   npm run migrate
+   ```
+5. Start the backend server:
+   ```bash
+   npm run dev
+   ```
+
+The backend exposes:
+- `GET /api/dashboard`
+- `GET /api/value-bets`
+- `GET /api/predictions`
+- `GET /api/live-analysis/:fixtureId`
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `POST /api/auth/refresh`
 
 ## Deployment
 
