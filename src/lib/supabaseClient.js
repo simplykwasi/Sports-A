@@ -25,7 +25,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
  */
 export async function withSupabaseErrorHandling(operation, timeoutMs = 10000) {
   return Promise.race([
-    operation(),
+    (async () => {
+      const result = await operation();
+      return result;
+    })(),
     new Promise((_, reject) =>
       setTimeout(
         () => reject(new Error(`Supabase operation timeout after ${timeoutMs}ms`)),

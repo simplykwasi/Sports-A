@@ -53,24 +53,32 @@ class ValueService {
       away: marketData.implied_away || (marketData.away_odds ? 1 / marketData.away_odds : null),
     };
 
-    const valueDelta = {
-      home: prediction.predicted_home_prob - implied.home,
-      draw: prediction.predicted_draw_prob - implied.draw,
-      away: prediction.predicted_away_prob - implied.away,
+    const odds = {
+      home: marketData.home_odds || (implied.home ? 1 / implied.home : null),
+      draw: marketData.draw_odds || (implied.draw ? 1 / implied.draw : null),
+      away: marketData.away_odds || (implied.away ? 1 / implied.away : null),
     };
 
-    const bestMarket = Object.entries(valueDelta).reduce((best, [key, delta]) => {
-      if (Math.abs(delta) > Math.abs(best.delta)) {
-        return { market: key, delta };
+    // Value = (Odds * Probability) - 1
+    const calculations = {
+      home: odds.home ? (odds.home * prediction.predicted_home_prob) - 1 : 0,
+      draw: odds.draw ? (odds.draw * prediction.predicted_draw_prob) - 1 : 0,
+      away: odds.away ? (odds.away * prediction.predicted_away_prob) - 1 : 0,
+    };
+
+    const bestMarket = Object.entries(calculations).reduce((best, [key, value]) => {
+      if (value > best.value) {
+        return { market: key, value };
       }
       return best;
-    }, { market: null, delta: 0 });
+    }, { market: null, value: -1 });
 
-    const valueFlag = Math.abs(bestMarket.delta) >= 0.05;
+    // A "Value Bet" is typically considered anything where Value > 0.05 (5% edge)
+    const valueFlag = bestMarket.value >= 0.05;
 
     return {
       valueFlag,
-      valueDelta: Number(bestMarket.delta.toFixed(5)),
+      valueDelta: Number(bestMarket.value.toFixed(5)),
       bestMarket: bestMarket.market,
       fairOdds: this.computeFairOdds(prediction.home_xg || 1.15, prediction.away_xg || 0.95, prediction.home_strength || 1, prediction.away_strength || 1),
       implied,

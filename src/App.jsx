@@ -1,6 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
-import { AuthProvider } from './context/AuthContext'
 import AppLayout from './components/layout/AppLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ui/ErrorBoundary'
@@ -75,7 +74,6 @@ const protectedRoutes = [
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
         <BrowserRouter>
           <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -102,7 +100,6 @@ function App() {
             </Routes>
           </Suspense>
         </BrowserRouter>
-      </AuthProvider>
     </ErrorBoundary>
   )
 }
