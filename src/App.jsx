@@ -1,6 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
+import { AuthProvider } from './context/AuthContext'
 import AppLayout from './components/layout/AppLayout'
+import ProtectedRoute from './components/ProtectedRoute'
+import ErrorBoundary from './components/ui/ErrorBoundary'
+import { DataTableSkeleton } from './components/ui/LoadingSkeletons'
 
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./pages/LandingPage'))
@@ -16,6 +20,17 @@ const FavoritesPage = lazy(() => import('./pages/FavoritesPage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage'))
 
+// Additional pages for 20-page frontend
+const ValueBetsPage = lazy(() => import('./pages/ValueBetsPage'))
+const OddsComparisonPage = lazy(() => import('./pages/OddsComparisonPage'))
+const LiveAnalysisPage = lazy(() => import('./pages/LiveAnalysisPage'))
+const MatchAnalyticsPage = lazy(() => import('./pages/MatchAnalyticsPage'))
+const SavedBetsPage = lazy(() => import('./pages/SavedBetsPage'))
+const BetHistoryPage = lazy(() => import('./pages/BetHistoryPage'))
+const TeamAnalyticsPage = lazy(() => import('./pages/TeamAnalyticsPage'))
+const PlayerStatsPage = lazy(() => import('./pages/PlayerStatsPage'))
+const WatchlistPage = lazy(() => import('./pages/WatchlistPage'))
+
 // Loading component
 function PageLoader() {
   return (
@@ -28,15 +43,28 @@ function PageLoader() {
   )
 }
 
-// Edit routes here when adding, removing, or renaming pages.
-const appRoutes = [
+// Public routes (no auth required)
+const publicRoutes = [
   { path: '/', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
+]
+
+// Protected routes (auth required)
+const protectedRoutes = [
   { path: '/dashboard', element: <DashboardPage /> },
   { path: '/matches', element: <UpcomingMatchesPage /> },
   { path: '/matches/:matchId', element: <MatchDetailsPage /> },
   { path: '/league-standings', element: <LeagueStandingsPage /> },
+  { path: '/value-bets', element: <ValueBetsPage /> },
+  { path: '/odds-comparison', element: <OddsComparisonPage /> },
+  { path: '/live-analysis', element: <LiveAnalysisPage /> },
+  { path: '/match-analytics/:fixtureId', element: <MatchAnalyticsPage /> },
+  { path: '/saved-bets', element: <SavedBetsPage /> },
+  { path: '/bet-history', element: <BetHistoryPage /> },
+  { path: '/team-analytics/:teamId', element: <TeamAnalyticsPage /> },
+  { path: '/player-stats/:playerId', element: <PlayerStatsPage /> },
+  { path: '/watchlist', element: <WatchlistPage /> },
   { path: '/profile', element: <UserProfilePage /> },
   { path: '/notifications', element: <NotificationsPage /> },
   { path: '/favorites', element: <FavoritesPage /> },
@@ -46,19 +74,36 @@ const appRoutes = [
 
 function App() {
   return (
-    <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          {/* Shared app shell for pages that use the main sidebar/topbar layout. */}
-          <Route element={<AppLayout />}>
-            {appRoutes.map((route) => (
-              <Route key={route.path} path={route.path} element={route.element} />
-            ))}
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Public routes */}
+              {publicRoutes.map((route) => (
+                <Route key={route.path} path={route.path} element={route.element} />
+              ))}
+
+              {/* Protected routes with app layout */}
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                {protectedRoutes.map((route) => (
+                  <Route key={route.path} path={route.path} element={route.element} />
+                ))}
+              </Route>
+
+              {/* Catch-all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
 

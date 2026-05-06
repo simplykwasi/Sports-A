@@ -6,20 +6,35 @@ import { useAuth } from '../hooks/useAuth'
 
 // Registration page for new users.
 function RegisterPage() {
-  const [username, setUsername] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
+  const [email, setEmail] = useState('')
+  const [displayName, setDisplayName] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const { hasAccount, isAuthReady, register } = useAuth()
 
-  const handleCreateAccount = (event) => {
+  const handleCreateAccount = async (event) => {
     event.preventDefault()
 
-    const result = register({ username, phoneNumber, password })
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match')
+      return
+    }
+
+    if (password.length < 6) {
+      setErrorMessage('Password must be at least 6 characters')
+      return
+    }
+
+    setIsLoading(true)
+
+    const result = await register(email, password, displayName)
 
     if (!result.ok) {
       setErrorMessage(result.error)
+      setIsLoading(false)
       return
     }
 
@@ -36,29 +51,31 @@ function RegisterPage() {
       <PageHero
         eyebrow="Register page"
         title="Create your Sports A account."
-        description="The registration form is separated and ready to connect to your backend once auth is added."
+        description="Sign up now to start receiving value bet recommendations and live match analytics."
       />
 
-      <SectionCard title="Register" description="Use this page for onboarding new users and plan selections later.">
+      <SectionCard title="Register" description="Join Sports A to track value bets and get real-time betting insights.">
         <form className="grid gap-4 md:max-w-xl" onSubmit={handleCreateAccount}>
           <div>
-            <label className="mb-2 block text-sm text-slate-300">Username</label>
+            <label className="mb-2 block text-sm text-slate-300">Email</label>
             <input
               className="input-field"
-              type="text"
-              placeholder="sportsa_user"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
             />
           </div>
           <div>
-            <label className="mb-2 block text-sm text-slate-300">Phone number</label>
+            <label className="mb-2 block text-sm text-slate-300">Display Name</label>
             <input
               className="input-field"
-              type="tel"
-              placeholder="+234 801 234 5678"
-              value={phoneNumber}
-              onChange={(event) => setPhoneNumber(event.target.value)}
+              type="text"
+              placeholder="Your Name"
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              required
             />
           </div>
           <div>
@@ -66,14 +83,26 @@ function RegisterPage() {
             <input
               className="input-field"
               type="password"
-              placeholder="Choose a password"
+              placeholder="Choose a strong password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm text-slate-300">Confirm Password</label>
+            <input
+              className="input-field"
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              required
             />
           </div>
           {errorMessage ? <p className="text-sm text-rose-300">{errorMessage}</p> : null}
-          <button type="submit" className="primary-button">
-            Create account
+          <button type="submit" className="primary-button" disabled={isLoading}>
+            {isLoading ? 'Creating account...' : 'Create account'}
           </button>
           <p className="text-sm text-slate-300">
             Already registered?{' '}

@@ -5,19 +5,22 @@ import BrandLogo from '../components/ui/BrandLogo'
 
 // Login screen for returning users.
 function LoginPage() {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  const { hasAccount, isAuthReady, signIn } = useAuth()
+  const { hasAccount, isAuthReady, login } = useAuth()
 
-  const handleSignIn = (event) => {
+  const handleSignIn = async (event) => {
     event.preventDefault()
+    setIsLoading(true)
 
-    const result = signIn({ username, password })
+    const result = await login(email, password)
 
     if (!result.ok) {
       setErrorMessage(result.error)
+      setIsLoading(false)
       return
     }
 
@@ -44,15 +47,15 @@ function LoginPage() {
 
         <div className="glass-panel p-6 md:p-8">
           <form className="grid gap-4" onSubmit={handleSignIn}>
-            {/* Login fields live here for future backend/auth integration. */}
             <div>
-              <label className="mb-2 block text-sm text-slate-300">Username</label>
+              <label className="mb-2 block text-sm text-slate-300">Email</label>
               <input
                 className="input-field"
-                type="text"
-                placeholder="sportsa_user"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
               />
             </div>
             <div>
@@ -63,11 +66,12 @@ function LoginPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                required
               />
             </div>
             {errorMessage ? <p className="text-sm text-rose-300">{errorMessage}</p> : null}
-            <button type="submit" className="primary-button w-full">
-              Sign in
+            <button type="submit" className="primary-button w-full" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
             <div className="flex flex-col gap-3 text-center">
               <button type="button" className="text-sm text-brand-300">

@@ -1,150 +1,147 @@
-import { useMemo, useState } from 'react'
-import { AuthContext } from './auth-context'
-import {
-  persistSession,
-  persistUsers,
-  readStoredSession,
-  readStoredUsers,
-} from '../lib/authStorage'
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { supabase, onAuthStateChange } from '../lib/supabaseClient';
 
-function getInitialAuthState() {
-  const storedUsers = readStoredUsers()
-  const storedSession = readStoredSession()
-  const sessionUser = storedUsers.find((user) => user.username === storedSession?.username) || null
+export const AuthContext = createContext(null);
 
-  return {
-    currentUser: sessionUser,
-    isAuthReady: true,
-  }
-}
-
-// Shared frontend auth state for sign in, sign up, profile, and header behavior.
+/**
+ * Supabase-based authentication provider with session persistence
+ */
 export function AuthProvider({ children }) {
-  const [{ currentUser, isAuthReady }, setAuthState] = useState(getInitialAuthState)
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Initialize auth state from session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        setCurrentUser(session.user);
+      }
+      setIsAuthReady(true);
+    };
+
+    checkSession();
+
+    // Subscribe to auth state changes
+    const { data: authListener } = onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setCurrentUser(session.user);
+      } else {
+        setCurrentUser(null);
+      }
+      setIsAuthReady(true);
+    });
+
+    return () => {
+      authListener?.subscription?.unsubscribe?.();
+    };
+  }, []);
+
+  /**
+   * Register new user and create profile
+   */
+  const register = useCallback(async (email, password, displayName) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName },
+        },
+      });
+
+      if (signUpError) throw signUpError;
+
+      // Create user profile in profiles table
+      if (data.user) {
+        const { error: profileError } = await supabase.from('profiles').insert([
+          {
+            user_id: data.user.id,
+            email: data.user.email,
+            display_name: displayName,
+            created_at: new Date().toISOString(),
+          },
+        ]);
+
+        if (profileError && profileError.code !== '23505') {
+          // 23505 = unique constraint, profile already exists
+          console.error('Profile creation failed:', profileError);
+        }
+      }
+
+      setCurrentUser(data.user);
+      return { ok: true, user: data.user };
+    } catch (err) {
+      setError(err.message);
+      return { ok: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  /**
+   * Login with email and password
+   */
+  const login = useCallback(async (email, password) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
+
+      setCurrentUser(data.user);
+      return { ok: true, user: data.user };
+    } catch (err) {
+      setError(err.message);
+      return { ok: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  /**
+   * Logout current user
+   */
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) throw signOutError;
+
+      setCurrentUser(null);
+      return { ok: true };
+    } catch (err) {
+      setError(err.message);
+      return { ok: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const authValue = useMemo(
     () => ({
       currentUser,
       hasAccount: Boolean(currentUser),
       isAuthReady,
-      signIn: ({ username, password }) => {
-        const normalizedUsername = username.trim()
-        const normalizedPassword = password.trim()
-
-        if (!normalizedUsername || !normalizedPassword) {
-          return { ok: false, error: 'Enter your username and password.' }
-        }
-
-        const storedUsers = readStoredUsers()
-        const matchedUser = storedUsers.find(
-          (user) => user.username.toLowerCase() === normalizedUsername.toLowerCase(),
-        )
-
-        if (!matchedUser || matchedUser.password !== normalizedPassword) {
-          return { ok: false, error: 'Invalid username or password.' }
-        }
-
-        persistSession({ username: matchedUser.username })
-        setAuthState({ currentUser: matchedUser, isAuthReady: true })
-
-        return { ok: true, user: matchedUser }
-      },
-      register: ({ username, phoneNumber, password }) => {
-        const normalizedUsername = username.trim()
-        const normalizedPhoneNumber = phoneNumber.trim()
-        const normalizedPassword = password.trim()
-
-        if (!normalizedUsername || !normalizedPhoneNumber || !normalizedPassword) {
-          return { ok: false, error: 'Fill in username, phone number, and password.' }
-        }
-
-        const storedUsers = readStoredUsers()
-        const usernameExists = storedUsers.some(
-          (user) => user.username.toLowerCase() === normalizedUsername.toLowerCase(),
-        )
-
-        if (usernameExists) {
-          return { ok: false, error: 'That username already exists. Use another one.' }
-        }
-
-        const newUser = {
-          username: normalizedUsername,
-          phoneNumber: normalizedPhoneNumber,
-          password: normalizedPassword,
-          joinedAt: new Date().toISOString(),
-          favoriteTeams: [],
-          favoriteLeagues: [],
-        }
-
-        persistUsers([...storedUsers, newUser])
-        persistSession({ username: newUser.username })
-        setAuthState({ currentUser: newUser, isAuthReady: true })
-
-        return { ok: true, user: newUser }
-      },
-      updatePreferences: ({ favoriteTeams, favoriteLeagues }) => {
-        if (!currentUser) {
-          return { ok: false, error: 'No active account.' }
-        }
-
-        const storedUsers = readStoredUsers()
-        const updatedUsers = storedUsers.map((user) => {
-          if (user.username !== currentUser.username) {
-            return user
-          }
-
-          return {
-            ...user,
-            favoriteTeams,
-            favoriteLeagues,
-          }
-        })
-
-        persistUsers(updatedUsers)
-
-        const updatedUser = updatedUsers.find((user) => user.username === currentUser.username)
-        setAuthState({ currentUser: updatedUser, isAuthReady: true })
-
-        return { ok: true, user: updatedUser }
-      },
-      updateProfile: ({ phoneNumber, password }) => {
-        if (!currentUser) {
-          return { ok: false, error: 'No active account.' }
-        }
-
-        const normalizedPhoneNumber = phoneNumber.trim()
-
-        if (!normalizedPhoneNumber) {
-          return { ok: false, error: 'Enter a phone number.' }
-        }
-
-        const storedUsers = readStoredUsers()
-        const updatedUsers = storedUsers.map((user) => {
-          if (user.username !== currentUser.username) {
-            return user
-          }
-
-          return {
-            ...user,
-            phoneNumber: normalizedPhoneNumber,
-            password: password && password.trim() ? password.trim() : user.password,
-          }
-        })
-
-        persistUsers(updatedUsers)
-
-        const updatedUser = updatedUsers.find((user) => user.username === currentUser.username)
-        setAuthState({ currentUser: updatedUser, isAuthReady: true })
-
-        return { ok: true, user: updatedUser }
-      },
-      signOut: () => {
-        persistSession(null)
-        setAuthState((state) => ({ ...state, currentUser: null }))
-      },
+      isLoading,
+      error,
+      register,
+      login,
+      logout,
     }),
-    [currentUser, isAuthReady],
-  )
+    [currentUser, isAuthReady, isLoading, error, register, login, logout]
+  );
 
-  return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
 }
