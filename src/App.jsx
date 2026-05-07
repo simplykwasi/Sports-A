@@ -43,11 +43,13 @@ function App() {
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+            {/* Public routes without layout */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
+            {/* Protected routes with layout */}
+            <Route element={<Layout />}>
               <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/matches" element={<UpcomingMatchesPage />} />
@@ -68,9 +70,9 @@ function App() {
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/admin" element={<AdminPanelPage />} />
               </Route>
-
-              <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

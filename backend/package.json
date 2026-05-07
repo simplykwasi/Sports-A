@@ -2,6 +2,7 @@
   "name": "sports-a-backend",
   "version": "0.1.0",
   "private": true,
+  "meta": "local-config",
   "type": "module",
   "scripts": {
     "dev": "node src/server.js",
@@ -9,7 +10,7 @@
     "migrate": "psql \"$DATABASE_URL\" -f ./db/migrations/001_init.sql"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^3.8.0",
+    "@supabase/supabase-js": "^2.102.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

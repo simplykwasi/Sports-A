@@ -1,5 +1,6 @@
 {
   "name": "sports-a",
+  "$schema": "https://json.schemastore.org/package.json",
   "private": true,
   "version": "0.0.0",
   "type": "module",
