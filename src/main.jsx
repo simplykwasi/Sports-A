@@ -1,12 +1,11 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { AuthProvider } from './context/AuthContext.jsx'
-import ErrorBoundary from './components/ui/ErrorBoundary.jsx'
 import './index.css'
+import { StrictMode } from 'react'
+import * as ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import ErrorBoundary from './components/ui/ErrorBoundary.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
 
-// Main app entry point.
-createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
       <AuthProvider>
