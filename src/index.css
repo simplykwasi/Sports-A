@@ -1,40 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
-@import 'tailwindcss';
 
-@theme {
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
-
-  --color-brand-50: #f4fef8;
-  --color-brand-300: #8df0ca;
-  --color-brand-400: #61e7bb;
-  --color-brand-500: #29d391;
-  --color-brand-700: #119164;
-  --color-ink-950: #07111f;
-  --color-ink-900: #0d1b2d;
-  --color-ink-800: #142742;
-  --color-ink-700: #223554;
-  --color-slate-300: #b1c1d7;
-  --color-slate-200: #ced8e7;
-  --color-slate-100: #ebf0f7;
-  --color-warning-400: #f6c760;
-  --color-danger-400: #ff7f7f;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   html {
+    color-scheme: dark;
     scroll-behavior: smooth;
   }
 
   body {
-    @apply m-0 min-h-screen bg-ink-950 font-body text-slate-100;
+    margin: 0;
+    min-height: 100vh;
+    @apply bg-ink-950 font-body text-slate-100 antialiased;
     background-image:
       radial-gradient(circle at top, rgba(41, 211, 145, 0.18), transparent 28%),
       linear-gradient(180deg, #0d1b2d 0%, #07111f 100%);
   }
 
-  * {
-    box-sizing: border-box;
+  img,
+  picture,
+  video,
+  canvas {
+    display: block;
+    max-width: 100%;
   }
 
   a {
@@ -50,6 +46,7 @@
   #root {
     @apply min-h-screen;
   }
+}
 
 /* Shared component utilities used across routed pages. */
 @layer components {

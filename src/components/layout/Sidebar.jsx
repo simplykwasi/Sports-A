@@ -1,24 +1,22 @@
 import { NavLink } from 'react-router-dom'
-import { FiBell, FiBookmark, FiSettings, FiUser, FiX } from 'react-icons/fi'
+import { Bell, Bookmark, Settings, User, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { navigationGroups } from '../../data/navigation'
 import BrandLogo from '../ui/BrandLogo'
 
-// Main sidebar with desktop rail behavior and mobile drawer behavior.
 function Sidebar({ isMobileOpen = false, onClose }) {
   const { hasAccount } = useAuth()
   const accountLinks = hasAccount
     ? [
-        { label: 'Profile', to: '/profile', icon: FiUser },
-        { label: 'Notifications', to: '/notifications', icon: FiBell },
-        { label: 'Favorites', to: '/favorites', icon: FiBookmark },
-        { label: 'Settings', to: '/settings', icon: FiSettings },
+        { label: 'Profile', to: '/profile', icon: User },
+        { label: 'Notifications', to: '/notifications', icon: Bell },
+        { label: 'Favorites', to: '/favorites', icon: Bookmark },
+        { label: 'Settings', to: '/settings', icon: Settings },
       ]
     : []
 
   return (
     <>
-      {/* Mobile/tablet overlay behind the drawer */}
       <button
         type="button"
         aria-label="Close sidebar overlay"
@@ -36,7 +34,6 @@ function Sidebar({ isMobileOpen = false, onClose }) {
         ].join(' ')}
       >
         <div className="mb-5 flex items-center justify-between gap-2 md:gap-3 xl:mb-10">
-          {/* Sidebar brand area */}
           <BrandLogo
             size="sm"
             className="min-w-0"
@@ -54,12 +51,11 @@ function Sidebar({ isMobileOpen = false, onClose }) {
               aria-label="Close sidebar"
               onClick={onClose}
             >
-              <FiX />
+              <X className="mx-auto h-5 w-5" aria-hidden />
             </button>
           </div>
         </div>
 
-        {/* Sidebar links are controlled from navigation.js */}
         <div className="sidebar-scroll min-h-0 flex-1 space-y-6 overflow-y-auto pr-1 xl:pr-2">
           {navigationGroups.map((group) => (
             <section key={group.title}>
@@ -84,7 +80,7 @@ function Sidebar({ isMobileOpen = false, onClose }) {
                         ].join(' ')
                       }
                     >
-                      <Icon className="sidebar-icon shrink-0 text-base" />
+                      <Icon className="sidebar-icon h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
                       <span className="sidebar-copy">{link.label}</span>
                     </NavLink>
                   )
@@ -116,7 +112,7 @@ function Sidebar({ isMobileOpen = false, onClose }) {
                         ].join(' ')
                       }
                     >
-                      <Icon className="sidebar-icon shrink-0 text-base" />
+                      <Icon className="sidebar-icon h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
                       <span className="sidebar-copy">{link.label}</span>
                     </NavLink>
                   )

@@ -70,6 +70,9 @@ export const matchListings = [
       crestUrl: 'https://crests.football-data.org/98.svg',
       apiId: 98
     },
+    expectedHomeGoals: 1.82,
+    expectedAwayGoals: 1.28,
+    bookOdds: { homeWin: 2.12, draw: 3.35, awayWin: 3.65 },
   },
   {
     id: 'arsenal-newcastle',
@@ -90,6 +93,9 @@ export const matchListings = [
       crestUrl: 'https://crests.football-data.org/67.svg',
       apiId: 67
     },
+    expectedHomeGoals: 1.94,
+    expectedAwayGoals: 0.98,
+    bookOdds: { homeWin: 1.72, draw: 3.9, awayWin: 4.8 },
   },
   {
     id: 'sociedad-atletico',
@@ -110,6 +116,9 @@ export const matchListings = [
       crestUrl: 'https://crests.football-data.org/78.svg',
       apiId: 78
     },
+    expectedHomeGoals: 1.38,
+    expectedAwayGoals: 1.22,
+    bookOdds: { homeWin: 2.85, draw: 3.25, awayWin: 2.65 },
   },
   {
     id: 'atalanta-roma',
@@ -130,6 +139,9 @@ export const matchListings = [
       crestUrl: 'https://crests.football-data.org/100.svg',
       apiId: 100
     },
+    expectedHomeGoals: 1.76,
+    expectedAwayGoals: 1.41,
+    bookOdds: { homeWin: 2.25, draw: 3.5, awayWin: 3.2 },
   },
   {
     id: 'dortmund-leipzig',
@@ -150,6 +162,9 @@ export const matchListings = [
       crestUrl: 'https://crests.football-data.org/721.svg',
       apiId: 721
     },
+    expectedHomeGoals: 1.91,
+    expectedAwayGoals: 1.46,
+    bookOdds: { homeWin: 2.05, draw: 3.6, awayWin: 3.55 },
   },
   {
     id: 'psg-monaco',
@@ -170,6 +185,9 @@ export const matchListings = [
       crestUrl: 'https://crests.football-data.org/547.svg',
       apiId: 547
     },
+    expectedHomeGoals: 2.08,
+    expectedAwayGoals: 1.05,
+    bookOdds: { homeWin: 1.48, draw: 4.4, awayWin: 6.25 },
   },
 ]
 

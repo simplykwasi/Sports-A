@@ -14,7 +14,7 @@ function TeamPill({ team }) {
 }
 
 // Clickable match card that routes to the full match details page.
-function MatchListCard({ match }) {
+function MatchListCard({ match, poissonSummary }) {
   return (
     <Link
       to={`/matches/${match.id}`}
@@ -41,6 +41,22 @@ function MatchListCard({ match }) {
           <TeamPill team={match.away} />
         </div>
       </div>
+
+      {poissonSummary ? (
+        <div className="mt-4 border-t border-white/10 pt-4 text-xs text-slate-300 md:text-sm">
+          <p className="font-semibold text-brand-300">Poisson · λ {poissonSummary.lambdaHome.toFixed(2)}–{poissonSummary.lambdaAway.toFixed(2)}</p>
+          <p className="mt-2 leading-relaxed text-slate-400">
+            1X2:{' '}
+            <span className="text-slate-200">
+              Home {(poissonSummary.homeWin * 100).toFixed(1)}% · Draw {(poissonSummary.draw * 100).toFixed(1)}% · Away{' '}
+              {(poissonSummary.awayWin * 100).toFixed(1)}%
+            </span>
+          </p>
+          {poissonSummary.valueHint ? (
+            <p className="mt-2 font-medium text-warning-400">{poissonSummary.valueHint}</p>
+          ) : null}
+        </div>
+      ) : null}
     </Link>
   )
 }

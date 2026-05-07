@@ -1,13 +1,20 @@
-import PageHero from '../components/ui/PageHero';
-import { usePredictionUpdates, useliveLiveMatchUpdates } from '../hooks/useRealtimeSubscription';
+import PageHero from '../components/ui/PageHero'
 
 export default function LiveAnalysisPage() {
   return (
-    <div>
-      <PageHero title="Live Analysis" subtitle="Real-time match updates and probability shifts" />
-      <div className="container mx-auto px-4 py-8">
-        <p className="text-gray-600">Live analysis loading...</p>
+    <div className="section-shell">
+      <PageHero
+        eyebrow="Live"
+        title="Live analysis hub"
+        description="Track probability shifts and in-play signals while realtime fixtures stream through Supabase. Open any fixture analytics route for socket-backed telemetry."
+      />
+      <div className="glass-panel px-4 py-6 text-sm text-slate-300 md:px-8">
+        <p>
+          Connect Supabase replication slots for <code className="text-brand-300">live_events</code> and{' '}
+          <code className="text-brand-300">predictions</code>, then drill into a fixture via Matches → Analyze for streaming
+          updates.
+        </p>
       </div>
     </div>
-  );
+  )
 }

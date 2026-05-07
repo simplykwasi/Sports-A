@@ -1,20 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  FiChevronDown,
-  FiLogOut,
-  FiMenu,
-  FiSearch,
-  FiUser,
-  FiUserPlus,
-  FiX,
-} from 'react-icons/fi'
+  ChevronDown,
+  LogOut,
+  Menu,
+  Search,
+  User,
+  UserPlus,
+  X,
+} from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { navigationGroups } from '../../data/navigation'
 import { matchListings } from '../../data/mockData'
 import BrandLogo from '../ui/BrandLogo'
 
-// Top navigation bar shared across the app layout.
 function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -117,7 +116,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
             aria-expanded={isMobileSidebarOpen}
             onClick={onMenuToggle}
           >
-            {isMobileSidebarOpen ? <FiX /> : <FiMenu />}
+            {isMobileSidebarOpen ? <X className="mx-auto h-5 w-5" /> : <Menu className="mx-auto h-5 w-5" />}
           </button>
 
           <BrandLogo
@@ -138,7 +137,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
               aria-label={isSearchOpen ? 'Close search' : 'Open search'}
               aria-expanded={isSearchOpen}
             >
-              <FiSearch />
+              <Search className="h-5 w-5" />
             </button>
 
             <div
@@ -152,7 +151,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
                 Search
               </label>
               <div className="flex h-11 items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3">
-                <FiSearch className="text-slate-300" />
+                <Search className="h-4 w-4 shrink-0 text-slate-300" aria-hidden />
                 <input
                   id="header-search"
                   type="search"
@@ -170,7 +169,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
                     Type a team, league, or page name to search.
                   </div>
                 ) : filteredSearchItems.length > 0 ? (
-                  <div className="grid gap-2 max-h-72 overflow-y-auto">
+                  <div className="grid max-h-72 gap-2 overflow-y-auto">
                     {filteredSearchItems.map((item) => (
                       <Link
                         key={item.id}
@@ -204,14 +203,15 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
               onClick={() => setIsProfileOpen((current) => !current)}
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/8 text-sm md:h-9 md:w-9">
-                <FiUser />
+                <User className="h-4 w-4" aria-hidden />
               </span>
               {hasAccount ? (
-                <span className="hidden truncate text-sm text-white sm:block">
-                  {currentUser.username}
-                </span>
+                <span className="hidden truncate text-sm text-white sm:block">{currentUser.username}</span>
               ) : null}
-              <FiChevronDown className={`text-sm text-slate-300 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`h-4 w-4 text-slate-300 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`}
+                aria-hidden
+              />
             </button>
 
             {isProfileOpen ? (
@@ -234,7 +234,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
                       onClick={handleSignOut}
                       className="flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-white/10"
                     >
-                      <FiLogOut />
+                      <LogOut className="h-4 w-4" aria-hidden />
                       Sign out
                     </button>
                   </div>
@@ -250,7 +250,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
                         onClick={() => setIsProfileOpen(false)}
                         className="flex items-center justify-center gap-2 rounded-2xl bg-brand-400 px-4 py-3 text-sm font-semibold text-ink-950 transition hover:bg-brand-300"
                       >
-                        <FiUser />
+                        <User className="h-4 w-4" aria-hidden />
                         Sign in
                       </Link>
                       <Link
@@ -258,7 +258,7 @@ function Topbar({ isMobileSidebarOpen, onMenuToggle }) {
                         onClick={() => setIsProfileOpen(false)}
                         className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                       >
-                        <FiUserPlus />
+                        <UserPlus className="h-4 w-4" aria-hidden />
                         Sign up
                       </Link>
                     </div>

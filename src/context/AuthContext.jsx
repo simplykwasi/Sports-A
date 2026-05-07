@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- context + provider module */
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase, onAuthStateChange } from '../lib/supabaseClient';
 

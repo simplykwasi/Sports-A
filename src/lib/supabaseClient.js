@@ -1,11 +1,11 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const DEFAULT_SUPABASE_URL = 'https://sijynfgkrcnhgmaqdcav.supabase.co'
+const DEFAULT_SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpanluZmdrcmNuaGdtYXFkY2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMTUwMDcsImV4cCI6MjA5MzU5MTAwN30.BUb1FNtJARVAOVQMDo479KFtlbNcf5-EZe7f3XYWOxI'
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)');
-}
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -18,34 +18,28 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       eventsPerSecond: 10,
     },
   },
-});
+})
 
-/**
- * Global error wrapper for Supabase operations with timeout handling
- */
 export async function withSupabaseErrorHandling(operation, timeoutMs = 10000) {
   return Promise.race([
     (async () => {
-      const result = await operation();
-      return result;
+      const result = await operation()
+      return result
     })(),
     new Promise((_, reject) =>
       setTimeout(
         () => reject(new Error(`Supabase operation timeout after ${timeoutMs}ms`)),
-        timeoutMs
-      )
+        timeoutMs,
+      ),
     ),
   ]).catch((error) => {
-    console.error('Supabase operation failed:', error.message);
-    return { error: { message: error.message } };
-  });
+    console.error('Supabase operation failed:', error.message)
+    return { error: { message: error.message } }
+  })
 }
 
-/**
- * Listen to auth state changes globally
- */
 export function onAuthStateChange(callback) {
   return supabase.auth.onAuthStateChange((event, session) => {
-    callback(event, session);
-  });
+    callback(event, session)
+  })
 }

@@ -1,28 +1,26 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { Navigate, Outlet } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
-/**
- * Protected route wrapper that redirects unauthorized users to landing page
- */
-export function ProtectedRoute({ children }) {
-  const { currentUser, isAuthReady } = useAuth();
+function ProtectedRoute() {
+  const { currentUser, isAuthReady } = useAuth()
 
   if (!isAuthReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-[50vh] items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-brand-400" />
+          <p className="text-sm text-slate-400">Loading session…</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!currentUser) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />
   }
 
-  return children;
+  return <Outlet />
 }
 
-export default ProtectedRoute;
+export { ProtectedRoute }
+export default ProtectedRoute
