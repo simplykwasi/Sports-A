@@ -1,112 +1,150 @@
-import { useMemo, useState } from 'react'
-import LeagueFilterTabs from '../components/matches/LeagueFilterTabs'
+import { useEffect, useMemo, useState } from 'react'
 import MatchListCard from '../components/matches/MatchListCard'
 import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
-import { matchLeagueTabs, matchListings, todaysMatches } from '../data/mockData'
-import { calculateMatchOutcome, findValueBets } from '../utils/mathEngine'
+import { supabase } from '../lib/supabaseClient'
+import { fetchMatchesFromSupabase } from '../services/sportsApi'
 
 function UpcomingMatchesPage() {
   const [activeLeague, setActiveLeague] = useState('All leagues')
-  const liveMatchIds = useMemo(
-    () => new Set(todaysMatches.filter((match) => match.status === 'Live').map((match) => match.id)),
-    [],
-  )
+  const [matches, setMatches] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadMatches = async () => {
+      setIsLoading(true)
+      setErrorMessage('')
+
+      try {
+        const rows = await fetchMatchesFromSupabase()
+        if (isMounted) {
+          setMatches(rows)
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(error.message || 'Unable to load Supabase matches.')
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    const channel = supabase
+      .channel('matches-page-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'matches',
+        },
+        async () => {
+          const rows = await fetchMatchesFromSupabase()
+          setMatches(rows)
+        },
+      )
+      .subscribe()
+
+    loadMatches()
+
+    return () => {
+      isMounted = false
+      supabase.removeChannel(channel)
+    }
+  }, [])
+
+  const leagueTabs = useMemo(() => {
+    const leagues = Array.from(new Set(matches.map((match) => match.league_name).filter(Boolean)))
+    return ['All leagues', 'Live', ...leagues]
+  }, [matches])
 
   const visibleMatches = useMemo(() => {
     if (activeLeague === 'Live') {
-      return matchListings.filter((match) => liveMatchIds.has(match.id))
+      return matches.filter((match) =>
+        ['1H', 'HT', '2H', 'ET', 'BT', 'P', 'SUSP', 'INT', 'LIVE'].includes(match.status_short),
+      )
     }
 
     if (activeLeague === 'All leagues') {
-      return matchListings
+      return matches
     }
 
-    return matchListings.filter((match) => match.league === activeLeague)
-  }, [activeLeague, liveMatchIds])
-
-  const matchMathById = useMemo(() => {
-    const map = new Map()
-    visibleMatches.forEach((match) => {
-      const λh = match.expectedHomeGoals
-      const λa = match.expectedAwayGoals
-      if (typeof λh !== 'number' || typeof λa !== 'number' || !match.bookOdds) {
-        return
-      }
-
-      const poisson = calculateMatchOutcome(λh, λa)
-      const modelPredictions = {
-        homeWin: poisson.homeWin,
-        draw: poisson.draw,
-        awayWin: poisson.awayWin,
-      }
-      const edges = findValueBets(modelPredictions, match.bookOdds, 0.02)
-      const topEdge = edges[0]
-
-      map.set(match.id, {
-        lambdaHome: λh,
-        lambdaAway: λa,
-        homeWin: poisson.homeWin,
-        draw: poisson.draw,
-        awayWin: poisson.awayWin,
-        valueHint: topEdge
-          ? `Model edge · ${topEdge.outcome} +${topEdge.edgePercentage.toFixed(1)}% vs book`
-          : null,
-      })
-    })
-    return map
-  }, [visibleMatches])
-
-  const slateEdges = useMemo(() => {
-    let count = 0
-    matchMathById.forEach((row) => {
-      if (row.valueHint) count += 1
-    })
-    return count
-  }, [matchMathById])
+    return matches.filter((match) => match.league_name === activeLeague)
+  }, [activeLeague, matches])
 
   return (
     <div className="section-shell">
       <PageHero
         eyebrow="Matches"
-        title="Browse matches by league."
-        description="Poisson projections use expected-goals inputs from each fixture card (demo slate). Value hints compare model prices against demo decimal odds."
+        title="Live and upcoming matches."
+        description="This page reads from the Supabase matches table and updates instantly when Realtime receives score or status changes."
       />
 
       <section className="glass-panel p-4 md:p-6">
-        <LeagueFilterTabs
-          leagues={matchLeagueTabs}
-          activeLeague={activeLeague}
-          onSelect={setActiveLeague}
-        />
+        <div className="flex flex-wrap gap-2">
+          {leagueTabs.map((league) => (
+            <button
+              key={league}
+              type="button"
+              className={[
+                'rounded-full border px-4 py-2 text-sm font-semibold transition',
+                activeLeague === league
+                  ? 'border-brand-300 bg-brand-400 text-ink-950'
+                  : 'border-white/10 bg-white/5 text-slate-200 hover:bg-white/10',
+              ].join(' ')}
+              onClick={() => setActiveLeague(league)}
+            >
+              {league}
+            </button>
+          ))}
+        </div>
       </section>
 
       <SectionCard
-        title="Math engine snapshot"
-        description="Clientside Poisson 1X2 from λ_home / λ_away · Value screening threshold ≥ 2% edge vs listed odds."
+        title="Supabase feed"
+        description="Rows are seeded from API-Football and refreshed via Supabase Realtime UPDATE events."
       >
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Visible fixtures</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Visible matches</p>
             <p className="mt-2 font-display text-3xl font-bold text-white">{visibleMatches.length}</p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Modeled edges found</p>
-            <p className="mt-2 font-display text-3xl font-bold text-brand-300">{slateEdges}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Total cached</p>
+            <p className="mt-2 font-display text-3xl font-bold text-brand-300">{matches.length}</p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Engine</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Realtime</p>
             <p className="mt-2 text-sm leading-relaxed text-slate-300">
-              Same helpers power dashboard fixtures when Supabase returns xG rows.
+              Listening for UPDATE events on public.matches.
             </p>
           </div>
         </div>
       </SectionCard>
 
+      {errorMessage ? (
+        <div className="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          {errorMessage}
+        </div>
+      ) : null}
+
       <section className="grid gap-4">
-        {visibleMatches.map((match) => (
-          <MatchListCard key={match.id} match={match} poissonSummary={matchMathById.get(match.id)} />
-        ))}
+        {isLoading ? (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+            Loading Supabase matches...
+          </div>
+        ) : visibleMatches.length > 0 ? (
+          visibleMatches.map((match) => <MatchListCard key={match.id} match={match} />)
+        ) : (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+            No matches found in Supabase yet. Use the Admin Panel sync button to seed today's fixtures.
+          </div>
+        )}
       </section>
     </div>
   )

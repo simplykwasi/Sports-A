@@ -2,12 +2,22 @@ import axios from 'axios'
 import { supabase } from '../lib/supabaseClient'
 
 const API_FOOTBALL_BASE_URL = 'https://v3.football.api-sports.io'
-const LIVE_STATUSES = ['1H', 'HT', '2H', 'ET', 'BT', 'P', 'SUSP', 'INT', 'LIVE']
+const MATCH_SELECT =
+  'id,status,status_short,status_long,home_score,away_score,kickoff_time'
 
 const sportsApiClient = axios.create({
   baseURL: API_FOOTBALL_BASE_URL,
   timeout: 12000,
 })
+
+function getTodayDate() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function apiFixtureIdToUuid(apiFixtureId) {
+  const suffix = String(apiFixtureId ?? '').replace(/\D/g, '').padStart(12, '0').slice(-12)
+  return `00000000-0000-4000-8000-${suffix}`
+}
 
 function getSportsApiKey() {
   return import.meta.env.VITE_SPORTS_API_KEY
@@ -31,33 +41,21 @@ function createSportsApiError(error) {
 
 export function mapApiFootballFixture(apiFixture) {
   const fixture = apiFixture.fixture ?? {}
-  const league = apiFixture.league ?? {}
-  const teams = apiFixture.teams ?? {}
   const goals = apiFixture.goals ?? {}
   const status = fixture.status ?? {}
 
   return {
-    id: fixture.id,
-    league_id: league.id ?? null,
-    league_name: league.name ?? null,
-    season: league.season ?? null,
-    home_team_id: teams.home?.id ?? null,
-    home_team_name: teams.home?.name ?? 'Home',
-    away_team_id: teams.away?.id ?? null,
-    away_team_name: teams.away?.name ?? 'Away',
-    elapsed: status.elapsed ?? null,
+    id: apiFixtureIdToUuid(fixture.id),
     status_short: status.short ?? null,
     status_long: status.long ?? null,
+    status: status.long ?? status.short ?? null,
     home_score: goals.home ?? null,
     away_score: goals.away ?? null,
     kickoff_time: fixture.date ?? null,
-    last_api_sync_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    raw_payload: apiFixture,
   }
 }
 
-export async function fetchLiveFixturesFromApiFootball() {
+export async function fetchFixturesFromApiFootball({ date = getTodayDate(), liveOnly = false } = {}) {
   const apiKey = getSportsApiKey()
 
   if (!apiKey) {
@@ -70,7 +68,7 @@ export async function fetchLiveFixturesFromApiFootball() {
 
   try {
     const { data } = await sportsApiClient.get('/fixtures', {
-      params: { live: 'all' },
+      params: liveOnly ? { live: 'all' } : { date },
       headers: {
         'x-apisports-key': apiKey,
       },
@@ -82,28 +80,53 @@ export async function fetchLiveFixturesFromApiFootball() {
   }
 }
 
-export async function fetchCachedMatchesFromSupabase() {
-  const { data, error } = await supabase
+export function fetchLiveFixturesFromApiFootball() {
+  return fetchFixturesFromApiFootball({ liveOnly: true })
+}
+
+function enrichMatchesWithTeams(matches) {
+  return matches.map((match) => ({
+    ...match,
+    home_team_name: match.home_team_name ?? 'Home',
+    away_team_name: match.away_team_name ?? 'Away',
+    home_logo_url: match.home_logo_url ?? null,
+    away_logo_url: match.away_logo_url ?? null,
+  }))
+}
+
+export async function fetchMatchesFromSupabase({ date = getTodayDate() } = {}) {
+  let query = supabase
     .from('matches')
-    .select('*')
-    .in('status_short', LIVE_STATUSES)
+    .select(MATCH_SELECT)
     .order('kickoff_time', { ascending: true })
+
+  if (date) {
+    const dayStart = `${date}T00:00:00.000Z`
+    const dayEnd = `${date}T23:59:59.999Z`
+    query = query.gte('kickoff_time', dayStart).lte('kickoff_time', dayEnd)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     throw error
   }
 
-  return data ?? []
+  return enrichMatchesWithTeams(data ?? [])
 }
 
-export async function syncLiveFixturesToSupabase() {
+export function fetchCachedMatchesFromSupabase(options) {
+  return fetchMatchesFromSupabase(options)
+}
+
+export async function syncFixturesToSupabase(options = {}) {
   try {
-    const fixtures = await fetchLiveFixturesFromApiFootball()
+    const fixtures = await fetchFixturesFromApiFootball(options)
     const rows = fixtures.map(mapApiFootballFixture).filter((row) => row.id)
 
     if (rows.length === 0) {
       return {
-        data: await fetchCachedMatchesFromSupabase(),
+        data: await fetchMatchesFromSupabase(options),
         source: 'cache',
         synced: 0,
         error: null,
@@ -120,13 +143,13 @@ export async function syncLiveFixturesToSupabase() {
     }
 
     return {
-      data: data ?? rows,
+      data: await enrichMatchesWithTeams(data ?? rows),
       source: 'api',
       synced: rows.length,
       error: null,
     }
   } catch (error) {
-    const cachedData = await fetchCachedMatchesFromSupabase().catch(() => [])
+    const cachedData = await fetchMatchesFromSupabase(options).catch(() => [])
 
     return {
       data: cachedData,
@@ -135,4 +158,12 @@ export async function syncLiveFixturesToSupabase() {
       error,
     }
   }
+}
+
+export function syncLiveFixturesToSupabase() {
+  return syncFixturesToSupabase({ date: getTodayDate() })
+}
+
+export function fetchMatches() {
+  return syncFixturesToSupabase({ date: getTodayDate() })
 }
