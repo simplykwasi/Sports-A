@@ -6,7 +6,7 @@ import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 import StatCard from '../components/ui/StatCard'
 import { useAuth } from '../hooks/useAuth'
-import { fetchMatchesFromSupabase } from '../services/sportsApi'
+import { fetchFixturesFromSupabase } from '../services/sportsApi'
 
 const LIVE_STATUSES = new Set(['1H', 'HT', '2H', 'ET', 'BT', 'P', 'SUSP', 'INT', 'LIVE'])
 const FINISHED_STATUSES = new Set(['FT', 'AET', 'PEN'])
@@ -25,13 +25,13 @@ function DashboardPage() {
       setErrorMessage('')
 
       try {
-        const rows = await fetchMatchesFromSupabase()
+        const rows = await fetchFixturesFromSupabase()
         if (isMounted) {
           setMatches(rows)
         }
       } catch (error) {
         if (isMounted) {
-          setErrorMessage(error.message || 'Unable to load Supabase matches.')
+          setErrorMessage(error.message || 'Unable to load Supabase fixtures.')
         }
       } finally {
         if (isMounted) {

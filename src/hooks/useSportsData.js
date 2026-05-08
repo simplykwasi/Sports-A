@@ -104,6 +104,19 @@ export function useSportsData(options = {}) {
     }
   }, [leagueId]);
 
+  /**
+   * Listen for live fixtures sync events and invalidate fixtures cache
+   */
+  useEffect(() => {
+    const handleLiveSync = () => {
+      cacheRef.current.fixtures = null;
+      fetchData();
+    };
+
+    window.addEventListener('sports-a:live-fixtures-sync', handleLiveSync);
+    return () => window.removeEventListener('sports-a:live-fixtures-sync', handleLiveSync);
+  }, [fetchData]);
+
   return {
     leagues,
     teams,

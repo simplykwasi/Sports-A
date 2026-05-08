@@ -43,15 +43,19 @@ export function mapApiFootballFixture(apiFixture) {
   const fixture = apiFixture.fixture ?? {}
   const goals = apiFixture.goals ?? {}
   const status = fixture.status ?? {}
+  const league = apiFixture.league ?? {}
+  const teams = apiFixture.teams ?? {}
 
   return {
-    id: apiFixtureIdToUuid(fixture.id),
+    external_fixture_id: fixture.id ?? null,
     status_short: status.short ?? null,
     status_long: status.long ?? null,
     status: status.long ?? status.short ?? null,
     home_score: goals.home ?? null,
     away_score: goals.away ?? null,
     kickoff_time: fixture.date ?? null,
+    venue: fixture.venue?.name ?? null,
+    raw_payload: apiFixture,
   }
 }
 
@@ -119,14 +123,36 @@ export function fetchCachedMatchesFromSupabase(options) {
   return fetchMatchesFromSupabase(options)
 }
 
+export async function fetchFixturesFromSupabase({ date = getTodayDate() } = {}) {
+  const fixtureSelect = 'external_fixture_id,status,status_short,status_long,home_score,away_score,kickoff_time,venue,league_id,home_team_id,away_team_id'
+  let query = supabase
+    .from('fixtures')
+    .select(fixtureSelect)
+    .order('kickoff_time', { ascending: true })
+
+  if (date) {
+    const dayStart = `${date}T00:00:00.000Z`
+    const dayEnd = `${date}T23:59:59.999Z`
+    query = query.gte('kickoff_time', dayStart).lte('kickoff_time', dayEnd)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    throw error
+  }
+
+  return data ?? []
+}
+
 export async function syncFixturesToSupabase(options = {}) {
   try {
     const fixtures = await fetchFixturesFromApiFootball(options)
-    const rows = fixtures.map(mapApiFootballFixture).filter((row) => row.id)
+    const rows = fixtures.map(mapApiFootballFixture).filter((row) => row.external_fixture_id)
 
     if (rows.length === 0) {
       return {
-        data: await fetchMatchesFromSupabase(options),
+        data: await fetchFixturesFromSupabase(options),
         source: 'cache',
         synced: 0,
         error: null,
@@ -134,8 +160,8 @@ export async function syncFixturesToSupabase(options = {}) {
     }
 
     const { data, error } = await supabase
-      .from('matches')
-      .upsert(rows, { onConflict: 'id' })
+      .from('fixtures')
+      .upsert(rows, { onConflict: 'external_fixture_id' })
       .select()
 
     if (error) {
@@ -143,13 +169,13 @@ export async function syncFixturesToSupabase(options = {}) {
     }
 
     return {
-      data: await enrichMatchesWithTeams(data ?? rows),
+      data: data ?? rows,
       source: 'api',
       synced: rows.length,
       error: null,
     }
   } catch (error) {
-    const cachedData = await fetchMatchesFromSupabase(options).catch(() => [])
+    const cachedData = await fetchFixturesFromSupabase(options).catch(() => [])
 
     return {
       data: cachedData,

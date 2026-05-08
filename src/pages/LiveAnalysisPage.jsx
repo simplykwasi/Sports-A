@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import PageHero from '../components/ui/PageHero'
-import { fetchCachedMatchesFromSupabase } from '../services/sportsApi'
+import { fetchFixturesFromSupabase } from '../services/sportsApi'
 
 export default function LiveAnalysisPage() {
   const [matches, setMatches] = useState([])
@@ -13,7 +13,7 @@ export default function LiveAnalysisPage() {
 
     const loadCachedMatches = async () => {
       try {
-        const cachedMatches = await fetchCachedMatchesFromSupabase()
+        const cachedMatches = await fetchFixturesFromSupabase()
         if (isMounted) {
           setMatches(cachedMatches)
         }

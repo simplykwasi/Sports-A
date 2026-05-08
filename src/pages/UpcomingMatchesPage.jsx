@@ -3,7 +3,7 @@ import MatchListCard from '../components/matches/MatchListCard'
 import PageHero from '../components/ui/PageHero'
 import SectionCard from '../components/ui/SectionCard'
 import { supabase } from '../lib/supabaseClient'
-import { fetchMatchesFromSupabase } from '../services/sportsApi'
+import { fetchFixturesFromSupabase } from '../services/sportsApi'
 
 function UpcomingMatchesPage() {
   const [activeLeague, setActiveLeague] = useState('All leagues')
@@ -19,13 +19,13 @@ function UpcomingMatchesPage() {
       setErrorMessage('')
 
       try {
-        const rows = await fetchMatchesFromSupabase()
+        const rows = await fetchFixturesFromSupabase()
         if (isMounted) {
           setMatches(rows)
         }
       } catch (error) {
         if (isMounted) {
-          setErrorMessage(error.message || 'Unable to load Supabase matches.')
+          setErrorMessage(error.message || 'Unable to load Supabase fixtures.')
         }
       } finally {
         if (isMounted) {
@@ -35,16 +35,16 @@ function UpcomingMatchesPage() {
     }
 
     const channel = supabase
-      .channel('matches-page-updates')
+      .channel('fixtures-page-updates')
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'matches',
+          table: 'fixtures',
         },
         async () => {
-          const rows = await fetchMatchesFromSupabase()
+          const rows = await fetchFixturesFromSupabase()
           setMatches(rows)
         },
       )
@@ -59,9 +59,8 @@ function UpcomingMatchesPage() {
   }, [])
 
   const leagueTabs = useMemo(() => {
-    const leagues = Array.from(new Set(matches.map((match) => match.league_name).filter(Boolean)))
-    return ['All leagues', 'Live', ...leagues]
-  }, [matches])
+    return ['All leagues', 'Live']
+  }, [])
 
   const visibleMatches = useMemo(() => {
     if (activeLeague === 'Live') {
@@ -70,11 +69,7 @@ function UpcomingMatchesPage() {
       )
     }
 
-    if (activeLeague === 'All leagues') {
-      return matches
-    }
-
-    return matches.filter((match) => match.league_name === activeLeague)
+    return matches
   }, [activeLeague, matches])
 
   return (
