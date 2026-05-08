@@ -17,7 +17,7 @@ function TeamPill({ team }) {
 function MatchListCard({ match, poissonSummary }) {
   return (
     <Link
-      to={`/matches/${match.id}`}
+      to={`/match/${match.id}`}
       className="glass-panel block w-full p-4 text-left transition hover:border-brand-300/40 hover:bg-brand-400/8 md:p-6"
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

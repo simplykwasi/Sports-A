@@ -304,7 +304,7 @@ function FavoritesPage() {
                 return (
                   <Link
                     key={match.id}
-                    to={`/matches/${match.id}`}
+                    to={`/match/${match.id}`}
                     className="rounded-4xl border border-white/10 bg-white/5 p-6 transition hover:border-brand-400/40 hover:bg-white/10"
                   >
                     <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">

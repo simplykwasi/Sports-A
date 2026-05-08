@@ -83,65 +83,27 @@
   }
 }
 
-@media (min-width: 1280px) {
-  .app-shell {
-    grid-template-columns: 96px minmax(0, 1fr);
-    transition: grid-template-columns 220ms ease;
-  }
-
-  .app-shell:has(.sidebar-shell:hover) {
-    grid-template-columns: 280px minmax(0, 1fr);
-  }
-
-  .sidebar-shell {
-    overflow: hidden;
-    transition:
-      width 220ms ease,
-      background-color 220ms ease;
-  }
-
-  .sidebar-scroll {
-    overflow-y: auto;
-    scrollbar-width: none;
-  }
-
-  .sidebar-scroll::-webkit-scrollbar {
-    display: none;
-  }
-
-  .sidebar-shell .sidebar-link {
-    justify-content: center;
-    padding-inline: 0.875rem;
-  }
-
-  .sidebar-shell .sidebar-copy,
-  .sidebar-shell .sidebar-action {
+@keyframes page-fade-in {
+  from {
     opacity: 0;
-    pointer-events: none;
-    transform: translateX(-10px);
-    transition:
-      opacity 180ms ease,
-      transform 180ms ease;
-    white-space: nowrap;
+    transform: translateY(8px);
   }
 
-  .sidebar-shell .sidebar-copy {
-    width: 0;
-    overflow: hidden;
-  }
-
-  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-copy,
-  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-action {
+  to {
     opacity: 1;
-    pointer-events: auto;
-    transform: translateX(0);
+    transform: translateY(0);
   }
+}
 
-  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-copy {
-    width: auto;
-  }
+.page-fade {
+  animation: page-fade-in 180ms ease-out both;
+}
 
-  .app-shell:has(.sidebar-shell:hover) .sidebar-shell .sidebar-link {
-    justify-content: flex-start;
-  }
+.sidebar-scroll {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  display: none;
 }

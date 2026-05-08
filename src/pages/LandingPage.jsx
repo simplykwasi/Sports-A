@@ -35,7 +35,7 @@ function LandingPage() {
             {liveMatches.map((match) => (
               <Link
                 key={match.id}
-                to={`/matches/${match.id}`}
+                to={`/match/${match.id}`}
                 className="block rounded-3xl border border-emerald-400/20 bg-slate-950/45 px-3 py-3 transition hover:border-emerald-400/40 hover:bg-slate-900/70 sm:px-4 sm:py-4"
               >
                 <div className="space-y-3 sm:space-y-4">
@@ -90,7 +90,7 @@ function LandingPage() {
               return (
                 <Link
                   key={match.id}
-                  to={`/matches/${match.id}`}
+                  to={`/match/${match.id}`}
                   className="block rounded-3xl border border-white/10 bg-slate-950/45 px-3 py-3 transition hover:border-emerald-400/30 hover:bg-slate-900/70 sm:px-4 sm:py-4"
                 >
                   <div className="space-y-3 sm:space-y-4">

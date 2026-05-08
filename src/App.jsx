@@ -1,6 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/layout/Layout'
-import ProtectedRoute from './components/ProtectedRoute'
 import AdminPanelPage from './pages/AdminPanelPage'
 import BetHistoryPage from './pages/BetHistoryPage'
 import DashboardPage from './pages/DashboardPage'
@@ -28,33 +27,31 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<LandingPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
-
-          <Route element={<ProtectedRoute />}>
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="matches" element={<UpcomingMatchesPage />} />
-            <Route path="matches/:matchId" element={<MatchDetailsPage />} />
-            <Route path="league-standings" element={<LeagueStandingsPage />} />
-            <Route path="value-bets" element={<ValueBetsPage />} />
-            <Route path="odds-comparison" element={<OddsComparisonPage />} />
-            <Route path="live-analysis" element={<LiveAnalysisPage />} />
-            <Route path="match-analytics/:fixtureId" element={<MatchAnalyticsPage />} />
-            <Route path="saved-bets" element={<SavedBetsPage />} />
-            <Route path="bet-history" element={<BetHistoryPage />} />
-            <Route path="team-analytics/:teamId" element={<TeamAnalyticsPage />} />
-            <Route path="player-stats/:playerId" element={<PlayerStatsPage />} />
-            <Route path="watchlist" element={<WatchlistPage />} />
-            <Route path="profile" element={<UserProfilePage />} />
-            <Route path="notifications" element={<NotificationsPage />} />
-            <Route path="favorites" element={<FavoritesPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="admin" element={<AdminPanelPage />} />
-          </Route>
-
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/matches" element={<UpcomingMatchesPage />} />
+          <Route path="/match/:id" element={<MatchDetailsPage />} />
+          <Route path="/matches/:matchId" element={<MatchDetailsPage />} />
+          <Route path="/league-standings" element={<LeagueStandingsPage />} />
+          <Route path="/value-bets" element={<ValueBetsPage />} />
+          <Route path="/odds-comparison" element={<OddsComparisonPage />} />
+          <Route path="/live-analysis" element={<LiveAnalysisPage />} />
+          <Route path="/match-analytics/:fixtureId" element={<MatchAnalyticsPage />} />
+          <Route path="/saved-bets" element={<SavedBetsPage />} />
+          <Route path="/bet-history" element={<BetHistoryPage />} />
+          <Route path="/team-analytics/:teamId" element={<TeamAnalyticsPage />} />
+          <Route path="/player-stats/:playerId" element={<PlayerStatsPage />} />
+          <Route path="/watchlist" element={<WatchlistPage />} />
+          <Route path="/profile" element={<UserProfilePage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/admin" element={<AdminPanelPage />} />
         </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )

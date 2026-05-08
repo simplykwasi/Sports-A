@@ -469,12 +469,13 @@ function PreMatchDetails({ match, details, hasAccount }) {
 }
 
 function MatchDetailsPage() {
-  const { matchId } = useParams()
+  const { id, matchId } = useParams()
+  const routeMatchId = id ?? matchId
   const { hasAccount } = useAuth()
 
   // Edit route-level match lookup here if the source of fixtures changes later.
-  const match = matchListings.find((item) => item.id === matchId)
-  const todayMatch = todaysMatches.find((item) => item.id === matchId)
+  const match = matchListings.find((item) => item.id === routeMatchId)
+  const todayMatch = todaysMatches.find((item) => item.id === routeMatchId)
 
   if (!match) {
     return <Navigate to="/matches" replace />
