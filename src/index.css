@@ -1,109 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
   html {
-    color-scheme: dark;
-    scroll-behavior: smooth;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   body {
-    margin: 0;
-    min-height: 100vh;
-    @apply bg-ink-950 font-body text-slate-100 antialiased;
-    background-image:
-      radial-gradient(circle at top, rgba(41, 211, 145, 0.18), transparent 28%),
-      linear-gradient(180deg, #0d1b2d 0%, #07111f 100%);
-  }
-
-  img,
-  picture,
-  video,
-  canvas {
-    display: block;
-    max-width: 100%;
-  }
-
-  a {
-    @apply text-inherit no-underline;
-  }
-
-  button,
-  input,
-  select {
-    font: inherit;
-  }
-
-  #root {
-    @apply min-h-screen;
+    @apply bg-slate-950 text-white;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-/* Shared component utilities used across routed pages. */
 @layer components {
   .glass-panel {
-    @apply rounded-3xl border border-white/10 bg-white/5 shadow-2xl shadow-black/20 backdrop-blur;
-  }
-
-  .section-shell {
-    @apply flex flex-col gap-6;
-  }
-
-  .page-title {
-    @apply font-display text-4xl font-bold tracking-tight text-white md:text-5xl;
-  }
-
-  .page-subtitle {
-    @apply max-w-3xl text-sm leading-7 text-slate-300 md:text-base;
-  }
-
-  .stat-card {
-    @apply rounded-3xl border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur;
-  }
-
-  .input-field {
-    @apply w-full rounded-2xl border border-white/10 bg-ink-900/70 px-4 py-3 text-slate-100 outline-none transition focus:border-brand-400;
+    @apply bg-slate-900/50 backdrop-blur-sm border border-slate-800;
   }
 
   .primary-button {
-    @apply inline-flex items-center justify-center rounded-full bg-brand-400 px-5 py-3 font-semibold text-ink-950 transition hover:bg-brand-300;
+    @apply bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition-colors;
   }
 
   .secondary-button {
-    @apply inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 font-semibold text-white transition hover:bg-white/10;
+    @apply bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg transition-colors border border-slate-700;
   }
-}
-
-@keyframes page-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.page-fade {
-  animation: page-fade-in 180ms ease-out both;
-}
-
-.sidebar-scroll {
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-
-.sidebar-scroll::-webkit-scrollbar {
-  display: none;
 }
