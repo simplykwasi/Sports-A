@@ -76,6 +76,8 @@ function Dashboard() {
     setSelectedMatch(null);
   };
 
+  const Motion = motion;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -89,13 +91,13 @@ function Dashboard() {
 
   const filteredMatches = matches.filter((match) => {
     if (activeFilter === "Live") {
-      return match.status.short !== "NS" && match.status.short !== "FT";
+      return match.statusShort !== "NS" && match.statusShort !== "FT";
     }
     return true;
   });
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="min-h-screen bg-slate-950">
       <Header />
 
       <main className="max-w-4xl mx-auto px-4 py-6">
@@ -121,7 +123,7 @@ function Dashboard() {
           </div>
         ) : null}
 
-        <motion.section
+        <Motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
@@ -139,7 +141,7 @@ function Dashboard() {
           <div className="grid gap-3">
             {valueBets.length > 0 ? (
               valueBets.map((bet, index) => (
-                <motion.div
+                <Motion.div
                   key={bet.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -166,7 +168,7 @@ function Dashboard() {
                       <div className="text-lg font-bold text-emerald-500">{bet.odds}</div>
                     </div>
                   </div>
-                </motion.div>
+                </Motion.div>
               ))
             ) : (
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-slate-400">
@@ -174,9 +176,9 @@ function Dashboard() {
               </div>
             )}
           </div>
-        </motion.section>
+        </Motion.section>
 
-        <motion.section
+        <Motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -194,14 +196,14 @@ function Dashboard() {
           <div className="space-y-3">
             {filteredMatches.length > 0 ? (
               filteredMatches.map((match, index) => (
-                <motion.div
+                <Motion.div
                   key={match.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + index * 0.05 }}
                 >
                   <MatchRow match={match} onClick={handleMatchClick} />
-                </motion.div>
+                </Motion.div>
               ))
             ) : (
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-slate-400 text-center">
@@ -209,7 +211,7 @@ function Dashboard() {
               </div>
             )}
           </div>
-        </motion.section>
+        </Motion.section>
       </main>
 
       <MatchInsight
@@ -217,7 +219,7 @@ function Dashboard() {
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
       />
-    </div>
+    </motion.div>
   );
 }
 

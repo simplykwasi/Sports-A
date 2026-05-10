@@ -138,12 +138,13 @@ const MatchInsight = ({ match, isOpen, onClose }) => {
     };
   };
 
+  const Motion = motion;
   const finalVerdict = getFinalVerdict();
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <Motion.div
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
@@ -251,7 +252,7 @@ const MatchInsight = ({ match, isOpen, onClose }) => {
               </div>
             )}
           </div>
-        </motion.div>
+        </Motion.div>
       )}
     </AnimatePresence>
   );

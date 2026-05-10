@@ -15,7 +15,7 @@ function MatchRow({ match, onClick }) {
     }
   };
 
-  const getPredictionColor = (type) => {
+  const getPredictionColor = () => {
     if (isValueBet) return 'bg-emerald-500';
     return 'bg-blue-500';
   };

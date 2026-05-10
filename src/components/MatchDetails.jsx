@@ -35,10 +35,12 @@ function MatchDetails({ match, isOpen, onClose }) {
     }
   };
 
-  const getPredictionColor = (type) => {
+  const getPredictionColor = () => {
     if (match.isValueBet) return 'text-emerald-500';
     return 'text-blue-500';
   };
+
+  const Motion = motion;
 
   return (
     <AnimatePresence>
@@ -54,7 +56,7 @@ function MatchDetails({ match, isOpen, onClose }) {
           />
 
           {/* Modal */}
-          <motion.div
+          <Motion.div
             variants={slideUpVariants}
             initial="hidden"
             animate="visible"
@@ -186,7 +188,7 @@ function MatchDetails({ match, isOpen, onClose }) {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </Motion.div>
         </>
       )}
     </AnimatePresence>
