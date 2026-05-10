@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Target, Star } from 'lucide-react';
 import Header from '../components/Header';
 import MatchRow from '../components/MatchRow';
-import MatchDetails from '../components/MatchDetails';
+import MatchInsight from '../components/MatchInsight';
+import AccuracyBanner from '../components/AccuracyBanner';
 import { fetchDailyMatches } from '../utils/api';
 import { PredictionEngine } from '../utils/predictionEngine';
 
@@ -11,6 +12,7 @@ function Dashboard() {
   const [matches, setMatches] = useState([]);
   const [valueBets, setValueBets] = useState([]);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [activeFilter, setActiveFilter] = useState("All");
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -85,11 +87,33 @@ function Dashboard() {
     );
   }
 
+  const filteredMatches = matches.filter((match) => {
+    if (activeFilter === "Live") {
+      return match.status.short !== "NS" && match.status.short !== "FT";
+    }
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-slate-950">
       <Header />
 
       <main className="max-w-4xl mx-auto px-4 py-6">
+        <div className="flex justify-center space-x-4 mb-6">
+          <button
+            onClick={() => setActiveFilter("All")}
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${activeFilter === "All" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+          >
+            All Matches
+          </button>
+          <button
+            onClick={() => setActiveFilter("Live")}
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${activeFilter === "Live" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+          >
+            Live Matches
+          </button>
+        </div>
+        <AccuracyBanner />
         {error ? (
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 mb-6 text-slate-100">
             <div className="font-semibold">Unable to load live data</div>
@@ -168,21 +192,27 @@ function Dashboard() {
           </div>
 
           <div className="space-y-3">
-            {matches.map((match, index) => (
-              <motion.div
-                key={match.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + index * 0.05 }}
-              >
-                <MatchRow match={match} onClick={handleMatchClick} />
-              </motion.div>
-            ))}
+            {filteredMatches.length > 0 ? (
+              filteredMatches.map((match, index) => (
+                <motion.div
+                  key={match.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + index * 0.05 }}
+                >
+                  <MatchRow match={match} onClick={handleMatchClick} />
+                </motion.div>
+              ))
+            ) : (
+              <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-slate-400 text-center">
+                No {activeFilter === "Live" ? "live" : ""} matches to display.
+              </div>
+            )}
           </div>
         </motion.section>
       </main>
 
-      <MatchDetails
+      <MatchInsight
         match={selectedMatch}
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
