@@ -79,7 +79,7 @@ function Dashboard() {
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin" />
-          <div className="text-white text-sm">Fetching today&apos;s live matches...</div>
+          <div className="text-white text-sm">Fetching today's live matches...</div>
         </div>
       </div>
     );
