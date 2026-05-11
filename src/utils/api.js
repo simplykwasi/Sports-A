@@ -53,6 +53,16 @@ function findStatValue(stats, keywords) {
   return stat ? stat.value ?? stat.total ?? stat.home ?? stat.away ?? 0 : 0;
 }
 
+function makeRequest(url) {
+  return fetch(url, {
+    headers: {
+      'x-rapidapi-key': import.meta.env.VITE_SPORTS_API_KEY,
+      'x-rapidapi-host': API_HOST,
+      Accept: 'application/json',
+    },
+  });
+}
+
 export async function fetchDailyMatches() {
   const apiKey = import.meta.env.VITE_SPORTS_API_KEY;
   if (!apiKey) {
@@ -61,14 +71,7 @@ export async function fetchDailyMatches() {
 
   const today = new Date().toISOString().slice(0, 10);
   const url = `${BASE_URL}/fixtures?date=${today}`;
-
-  const response = await fetch(url, {
-    headers: {
-      'x-rapidapi-key': apiKey,
-      'x-rapidapi-host': API_HOST,
-      'Accept': 'application/json',
-    },
-  });
+  const response = await makeRequest(url);
 
   if (!response.ok) {
     const body = await response.text();
@@ -85,9 +88,25 @@ export async function fetchDailyMatches() {
     .map(mapApiFootballMatch);
 }
 
-export async function getMatchDetails(matchId) {
-  const matches = await fetchDailyMatches();
-  return matches.find((match) => String(match.id) === String(matchId)) ?? null;
+export async function fetchMatchDetails(matchId) {
+  const apiKey = import.meta.env.VITE_SPORTS_API_KEY;
+  if (!apiKey) {
+    throw new Error('Missing VITE_SPORTS_API_KEY. Add your API-Football key to .env');
+  }
+
+  const url = `${BASE_URL}/fixtures?id=${encodeURIComponent(matchId)}`;
+  const response = await makeRequest(url);
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const json = await response.json();
+  if (!Array.isArray(json.response) || json.response.length === 0) {
+    return null;
+  }
+
+  return mapApiFootballMatch(json.response[0]);
 }
 
 export async function fetchYesterdayFixtures() {
@@ -99,16 +118,8 @@ export async function fetchYesterdayFixtures() {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayFormatted = yesterday.toISOString().slice(0, 10);
-
   const url = `${BASE_URL}/fixtures?date=${yesterdayFormatted}`;
-
-  const response = await fetch(url, {
-    headers: {
-      "x-rapidapi-key": apiKey,
-      "x-rapidapi-host": API_HOST,
-      "Accept": "application/json",
-    },
-  });
+  const response = await makeRequest(url);
 
   if (!response.ok) {
     const body = await response.text();
@@ -117,12 +128,11 @@ export async function fetchYesterdayFixtures() {
 
   const json = await response.json();
   if (!Array.isArray(json.response)) {
-    throw new Error("Unexpected API-Football response format");
+    throw new Error('Unexpected API-Football response format');
   }
 
-  // Filter for finished matches from top leagues
   return json.response
-    .filter((item) => TOP_LEAGUES.has(item.league?.name) && item.fixture?.status?.short === "FT")
+    .filter((item) => TOP_LEAGUES.has(item.league?.name) && item.fixture?.status?.short === 'FT')
     .map(mapApiFootballMatch);
 }
 
@@ -133,22 +143,23 @@ export async function fetchMatchStatistics(fixtureId) {
   }
 
   const url = `${BASE_URL}/fixtures/statistics?fixture=${encodeURIComponent(fixtureId)}`;
-  const response = await fetch(url, {
-    headers: {
-      'x-rapidapi-key': apiKey,
-      'x-rapidapi-host': API_HOST,
-      'Accept': 'application/json',
-    },
-  });
+  const response = await makeRequest(url);
 
   if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`API-Football statistics request failed (${response.status}): ${body}`);
+    return {
+      shots: { home: 0, away: 0 },
+      possession: { home: 0, away: 0 },
+      corners: { home: 0, away: 0 },
+    };
   }
 
   const json = await response.json();
-  if (!Array.isArray(json.response)) {
-    throw new Error('Unexpected API-Football statistics response format');
+  if (!Array.isArray(json.response) || json.response.length === 0) {
+    return {
+      shots: { home: 0, away: 0 },
+      possession: { home: 0, away: 0 },
+      corners: { home: 0, away: 0 },
+    };
   }
 
   const [homeStats = {}, awayStats = {}] = json.response;
@@ -171,30 +182,22 @@ export async function fetchMatchStatistics(fixtureId) {
   };
 }
 
-export async function fetchHeadToHead(team1, team2) {
+export async function fetchHeadToHead(h2hId) {
   const apiKey = import.meta.env.VITE_SPORTS_API_KEY;
   if (!apiKey) {
     throw new Error('Missing VITE_SPORTS_API_KEY. Add your API-Football key to .env');
   }
 
-  const url = `${BASE_URL}/fixtures/headtohead?h2h=${encodeURIComponent(`${team1}-${team2}`)}`;
-
-  const response = await fetch(url, {
-    headers: {
-      'x-rapidapi-key': apiKey,
-      'x-rapidapi-host': API_HOST,
-      'Accept': 'application/json',
-    },
-  });
+  const url = `${BASE_URL}/fixtures/headtohead?h2h=${encodeURIComponent(h2hId)}`;
+  const response = await makeRequest(url);
 
   if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`API-Football head-to-head request failed (${response.status}): ${body}`);
+    return [];
   }
 
   const json = await response.json();
   if (!Array.isArray(json.response)) {
-    throw new Error('Unexpected API-Football head-to-head response format');
+    return [];
   }
 
   return json.response

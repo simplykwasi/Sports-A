@@ -24,10 +24,11 @@ function MatchDetail() {
         }
         setMatch(foundMatch);
 
+        const h2hId = `${foundMatch.homeTeam}-${foundMatch.awayTeam}`;
         const [predictionResult, statsResult, headToHeadResult] = await Promise.all([
           PredictionEngine.fetchPredictions([foundMatch]),
           fetchMatchStatistics(foundMatch.id),
-          fetchHeadToHead(foundMatch.homeTeam, foundMatch.awayTeam),
+          fetchHeadToHead(h2hId),
         ]);
 
         setPrediction(predictionResult[0] ?? null);
