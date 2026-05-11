@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { Radio, Zap } from 'lucide-react';
 
-function Header() {
-  const [showLiveOnly, setShowLiveOnly] = useState(false);
+function Header({ activeFilter, onFilterChange }) {
+  const isLive = activeFilter === 'Live';
 
   return (
     <header className="bg-slate-950 border-b border-slate-800 px-4 py-3">
@@ -16,9 +15,10 @@ function Header() {
 
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setShowLiveOnly(!showLiveOnly)}
+            type="button"
+            onClick={() => onFilterChange(isLive ? 'All' : 'Live')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              showLiveOnly
+              isLive
                 ? 'bg-amber-500 text-slate-900'
                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Target, Star } from 'lucide-react';
+import { Star, Target } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import MatchRow from '../components/MatchRow';
-import MatchInsight from '../components/MatchInsight';
 import AccuracyBanner from '../components/AccuracyBanner';
 import { fetchDailyMatches } from '../utils/api';
 import { PredictionEngine } from '../utils/predictionEngine';
@@ -11,11 +11,10 @@ import { PredictionEngine } from '../utils/predictionEngine';
 function Dashboard() {
   const [matches, setMatches] = useState([]);
   const [valueBets, setValueBets] = useState([]);
-  const [selectedMatch, setSelectedMatch] = useState(null);
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const loadData = useCallback(async (showLoading = true) => {
     if (showLoading) {
@@ -25,8 +24,11 @@ function Dashboard() {
 
     try {
       const rawMatches = await fetchDailyMatches();
+      const predictions = await PredictionEngine.fetchPredictions(rawMatches);
+      const predictionById = new Map(predictions.map((item) => [String(item.id), item]));
+
       const enrichedMatches = rawMatches.map((match) => {
-        const prediction = PredictionEngine.analyzeMatch(match);
+        const prediction = predictionById.get(String(match.id)) ?? null;
         return {
           ...match,
           prediction,
@@ -36,7 +38,7 @@ function Dashboard() {
 
       const topValueBets = enrichedMatches
         .filter((match) => match.isValueBet)
-        .sort((a, b) => b.prediction.confidence - a.prediction.confidence)
+        .sort((a, b) => (b.prediction?.confidence ?? 0) - (a.prediction?.confidence ?? 0))
         .slice(0, 5);
 
       setMatches(enrichedMatches);
@@ -55,7 +57,7 @@ function Dashboard() {
   }, [loadData]);
 
   useEffect(() => {
-    if (!matches.some((match) => match.status === 'live')) {
+    if (!matches.some((match) => ['1H', '2H', 'HT'].includes(match.statusShort))) {
       return undefined;
     }
 
@@ -67,13 +69,7 @@ function Dashboard() {
   }, [matches, loadData]);
 
   const handleMatchClick = (match) => {
-    setSelectedMatch(match);
-    setIsDetailsOpen(true);
-  };
-
-  const handleCloseDetails = () => {
-    setIsDetailsOpen(false);
-    setSelectedMatch(null);
+    navigate(`/match/${match.id}`);
   };
 
   const Motion = motion;
@@ -89,33 +85,38 @@ function Dashboard() {
     );
   }
 
+  const liveStatuses = new Set(['1H', '2H', 'HT']);
   const filteredMatches = matches.filter((match) => {
-    if (activeFilter === "Live") {
-      return match.statusShort !== "NS" && match.statusShort !== "FT";
+    if (activeFilter === 'Live') {
+      return liveStatuses.has(match.statusShort);
     }
     return true;
   });
 
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="min-h-screen bg-slate-950">
-      <Header />
+    <Motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="min-h-screen bg-slate-950">
+      <Header activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
       <main className="max-w-4xl mx-auto px-4 py-6">
         <div className="flex justify-center space-x-4 mb-6">
           <button
-            onClick={() => setActiveFilter("All")}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${activeFilter === "All" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+            type="button"
+            onClick={() => setActiveFilter('All')}
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${activeFilter === 'All' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
           >
             All Matches
           </button>
           <button
-            onClick={() => setActiveFilter("Live")}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${activeFilter === "Live" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+            type="button"
+            onClick={() => setActiveFilter('Live')}
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${activeFilter === 'Live' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
           >
             Live Matches
           </button>
         </div>
-        <AccuracyBanner />
+
+        <AccuracyBanner onViewClick={() => navigate('/accuracy')} />
+
         {error ? (
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 mb-6 text-slate-100">
             <div className="font-semibold">Unable to load live data</div>
@@ -162,7 +163,7 @@ function Dashboard() {
 
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <div className="text-emerald-500 font-bold">{bet.prediction?.type || 'Prediction'}</div>
+                        <div className="text-emerald-500 font-bold">{bet.prediction?.recommendedBet || 'Prediction'}</div>
                         <div className="text-xs text-slate-400">{bet.prediction?.confidence}% confidence</div>
                       </div>
                       <div className="text-lg font-bold text-emerald-500">{bet.odds}</div>
@@ -207,19 +208,13 @@ function Dashboard() {
               ))
             ) : (
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-slate-400 text-center">
-                No {activeFilter === "Live" ? "live" : ""} matches to display.
+                No {activeFilter === 'Live' ? 'live' : ''} matches to display.
               </div>
             )}
           </div>
         </Motion.section>
       </main>
-
-      <MatchInsight
-        match={selectedMatch}
-        isOpen={isDetailsOpen}
-        onClose={handleCloseDetails}
-      />
-    </motion.div>
+    </Motion.div>
   );
 }
 
