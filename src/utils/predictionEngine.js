@@ -1,4 +1,4 @@
-const BACKEND_BASE_URL = import.meta.env.VITE_PYTHON_BACKEND_URL || 'http://localhost:8000';
+const BACKEND_BASE_URL = window.location.hostname === 'localhost' ? 'http://127.0.0.1:8000' : (import.meta.env.VITE_PYTHON_BACKEND_URL || 'https://your-deployed-python-url.com');
 
 function normalizeMatchInput(match) {
   return {

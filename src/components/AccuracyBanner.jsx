@@ -15,7 +15,8 @@ function AccuracyBanner({ onViewClick }) {
         setAccuracyData(data);
       } catch (err) {
         console.error('Failed to load yesterday accuracy:', err);
-        setError('Failed to load yesterday accuracy.');
+        setAccuracyData({ hitRate: 0, hitCount: 0, totalMatches: 0, details: [] });
+        setError('Backend unavailable. Showing mock data.');
       } finally {
         setLoading(false);
       }

@@ -17,6 +17,7 @@ function Accuracy() {
         setAccuracyData(data);
       } catch (err) {
         setError(err.message || 'Unable to load accuracy history.');
+        setAccuracyData({ hitRate: 0, hitCount: 0, totalMatches: 0, details: [] });
       } finally {
         setLoading(false);
       }
