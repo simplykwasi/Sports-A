@@ -24,6 +24,7 @@ app.add_middleware(
 
 def api_get(url: str) -> dict:
     headers = {
+        'x-apisports-key': API_KEY,
         'x-rapidapi-key': API_KEY,
         'x-rapidapi-host': 'v3.football.api-sports.io',
         'Accept': 'application/json',
@@ -31,6 +32,7 @@ def api_get(url: str) -> dict:
     print(f"Requesting API-Football: {url}")
     response = requests.get(url, headers=headers, timeout=10)
     print(f"API Response Status: {response.status_code}")
+
     if response.status_code != 200:
         error_msg = 'API-Football error'
         try:
@@ -38,7 +40,13 @@ def api_get(url: str) -> dict:
             error_msg = error_data.get('message', error_msg)
         except Exception:
             error_msg = response.text or error_msg
+
+        if response.status_code in {401, 403}:
+            print(f"Auth failure ({response.status_code}): {error_msg}")
+            raise HTTPException(status_code=response.status_code, detail=error_msg)
+
         raise HTTPException(status_code=502, detail=error_msg)
+
     return response.json()
 
 
@@ -75,7 +83,8 @@ class MatchInput(BaseModel):
     id: str
     homeTeam: str
     awayTeam: str
-    league: Optional[str] = None
+    leagueName: Optional[str] = None
+    leagueCountry: Optional[str] = None
     time: Optional[str] = None
     odds: Optional[float] = 1.85
     statusShort: Optional[str] = None
@@ -227,7 +236,8 @@ def fetch_yesterday_fixtures() -> List[MatchInput]:
                 id=str(fixture.get('id', f"{league_name}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}")),
                 homeTeam=teams.get('home', {}).get('name', 'Home'),
                 awayTeam=teams.get('away', {}).get('name', 'Away'),
-                league=f"{league_name} - {league_country}" if league_country else league_name,
+                leagueName=league_name,
+                leagueCountry=league_country,
                 time=fixture.get('date', '')[:16],
                 statusShort=status_short,
                 homeScore=safe_int(goals.get('home')),
@@ -260,7 +270,8 @@ def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
                 id=str(fixture.get('id', f"{league_name}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}")),
                 homeTeam=teams.get('home', {}).get('name', 'Home'),
                 awayTeam=teams.get('away', {}).get('name', 'Away'),
-                league=f"{league_name} - {league_country}" if league_country else league_name,
+                leagueName=league_name,
+                leagueCountry=league_country,
                 time=fixture.get('date', '')[:16],
                 statusShort=status_short,
                 homeScore=safe_int(goals.get('home')),
@@ -272,16 +283,28 @@ def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
     return fixtures
 
 
+def map_status_label(status_short: Optional[str]) -> str:
+    if status_short == 'NS':
+        return 'Upcoming'
+    if status_short in {'1H', '2H', 'HT', 'ET', 'P'}:
+        return 'LIVE'
+    if status_short == 'FT':
+        return 'Finished'
+    return status_short or 'Upcoming'
+
+
 def format_prediction_payload(match: MatchInput, prediction: PredictionOutput) -> dict:
     return {
-        "id": match.id,
-        "homeTeam": match.homeTeam,
-        "awayTeam": match.awayTeam,
-        "leagueName": match.league,
-        "prediction": prediction.recommendedBet,
-        "confidence": prediction.confidence,
-        "status": match.statusShort or 'NS',
-        "score": f"{match.homeScore or 0}-{match.awayScore or 0}",
+        'id': match.id,
+        'homeTeam': match.homeTeam,
+        'awayTeam': match.awayTeam,
+        'leagueName': match.leagueName,
+        'leagueCountry': match.leagueCountry,
+        'status': map_status_label(match.statusShort),
+        'time': match.time,
+        'score': f"{match.homeScore or 0}-{match.awayScore or 0}",
+        'prediction': prediction.recommendedBet,
+        'confidence': prediction.confidence,
     }
 
 
