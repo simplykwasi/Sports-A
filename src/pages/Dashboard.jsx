@@ -43,6 +43,7 @@ function Dashboard() {
 
       setMatches(enrichedMatches);
       setValueBets(topValueBets);
+      console.log('Matches state:', enrichedMatches);
     } catch (fetchError) {
       setError(fetchError.message || 'Unable to load live matches.');
     } finally {

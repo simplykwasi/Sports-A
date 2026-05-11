@@ -71,14 +71,18 @@ export async function fetchDailyMatches() {
 
   const today = new Date().toISOString().slice(0, 10);
   const url = `${BASE_URL}/fixtures?date=${today}`;
+  console.log('Fetching from:', url);
+  console.log('API Key exists:', !!apiKey);
   const response = await makeRequest(url);
 
   if (!response.ok) {
     const body = await response.text();
+    console.log('API response body:', body);
     throw new Error(`API-Football request failed (${response.status}): ${body}`);
   }
 
   const json = await response.json();
+  console.log('API response data:', json);
   if (!Array.isArray(json.response)) {
     throw new Error('Unexpected API-Football response format');
   }
@@ -95,13 +99,17 @@ export async function fetchMatchDetails(matchId) {
   }
 
   const url = `${BASE_URL}/fixtures?id=${encodeURIComponent(matchId)}`;
+  console.log('Fetching from:', url);
+  console.log('API Key exists:', !!apiKey);
   const response = await makeRequest(url);
 
   if (!response.ok) {
+    console.log('API response status:', response.status);
     return null;
   }
 
   const json = await response.json();
+  console.log('API response data:', json);
   if (!Array.isArray(json.response) || json.response.length === 0) {
     return null;
   }
@@ -119,14 +127,18 @@ export async function fetchYesterdayFixtures() {
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayFormatted = yesterday.toISOString().slice(0, 10);
   const url = `${BASE_URL}/fixtures?date=${yesterdayFormatted}`;
+  console.log('Fetching from:', url);
+  console.log('API Key exists:', !!apiKey);
   const response = await makeRequest(url);
 
   if (!response.ok) {
     const body = await response.text();
+    console.log('API response body:', body);
     throw new Error(`API-Football request failed (${response.status}): ${body}`);
   }
 
   const json = await response.json();
+  console.log('API response data:', json);
   if (!Array.isArray(json.response)) {
     throw new Error('Unexpected API-Football response format');
   }
@@ -143,9 +155,12 @@ export async function fetchMatchStatistics(fixtureId) {
   }
 
   const url = `${BASE_URL}/fixtures/statistics?fixture=${encodeURIComponent(fixtureId)}`;
+  console.log('Fetching from:', url);
+  console.log('API Key exists:', !!apiKey);
   const response = await makeRequest(url);
 
   if (!response.ok) {
+    console.log('API response status:', response.status);
     return {
       shots: { home: 0, away: 0 },
       possession: { home: 0, away: 0 },
@@ -154,6 +169,7 @@ export async function fetchMatchStatistics(fixtureId) {
   }
 
   const json = await response.json();
+  console.log('API response data:', json);
   if (!Array.isArray(json.response) || json.response.length === 0) {
     return {
       shots: { home: 0, away: 0 },
@@ -189,13 +205,17 @@ export async function fetchHeadToHead(h2hId) {
   }
 
   const url = `${BASE_URL}/fixtures/headtohead?h2h=${encodeURIComponent(h2hId)}`;
+  console.log('Fetching from:', url);
+  console.log('API Key exists:', !!apiKey);
   const response = await makeRequest(url);
 
   if (!response.ok) {
+    console.log('API response status:', response.status);
     return [];
   }
 
   const json = await response.json();
+  console.log('API response data:', json);
   if (!Array.isArray(json.response)) {
     return [];
   }
