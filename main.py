@@ -1,13 +1,16 @@
-import datetime
 import os
+from datetime import datetime, timedelta
 from typing import List, Optional
 
+import pytz
 import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-TOP_LEAGUES = set()  # Removed hardcoded filters to fetch globally
+API_KEY = os.getenv('API_FOOTBALL_API_KEY', '3041353cf06b3eb32032dc0a68762f98')
+BASE_URL = 'https://v3.football.api-sports.io'
+TIMEZONE = 'Africa/Accra'
 
 app = FastAPI(title='Sports Predictor Brain')
 app.add_middleware(
@@ -17,6 +20,43 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def api_get(url: str) -> dict:
+    headers = {
+        'x-rapidapi-key': API_KEY,
+        'x-rapidapi-host': 'v3.football.api-sports.io',
+        'Accept': 'application/json',
+    }
+    print(f"Requesting API-Football: {url}")
+    response = requests.get(url, headers=headers, timeout=10)
+    print(f"API Response Status: {response.status_code}")
+    if response.status_code != 200:
+        error_msg = 'API-Football error'
+        try:
+            error_data = response.json()
+            error_msg = error_data.get('message', error_msg)
+        except Exception:
+            error_msg = response.text or error_msg
+        raise HTTPException(status_code=502, detail=error_msg)
+    return response.json()
+
+
+def current_accra_date() -> str:
+    tz = pytz.timezone(TIMEZONE)
+    return datetime.now(tz).date().isoformat()
+
+
+def yesterday_accra_date() -> str:
+    tz = pytz.timezone(TIMEZONE)
+    return (datetime.now(tz).date() - timedelta(days=1)).isoformat()
+
+
+def safe_int(value: Optional[int], fallback: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return fallback
 
 
 def normalize_probabilities(values: List[float]) -> List[float]:
@@ -162,152 +202,55 @@ def is_hit(recommended_bet: str, match: MatchInput) -> bool:
 
 
 def fetch_yesterday_fixtures() -> List[MatchInput]:
-    API_KEY = os.getenv('VITE_SPORTS_API_KEY')
     if not API_KEY:
-        return [
-            MatchInput(
-                id='demo-1',
-                homeTeam='Chelsea',
-                awayTeam='Manchester United',
-                league='Premier League',
-                time='18:30',
-                odds=1.92,
-                statusShort='FT',
-                homeScore=2,
-                awayScore=1,
-            ),
-            MatchInput(
-                id='demo-2',
-                homeTeam='Real Madrid',
-                awayTeam='Barcelona',
-                league='La Liga',
-                time='20:00',
-                odds=2.15,
-                statusShort='FT',
-                homeScore=1,
-                awayScore=1,
-            ),
-            MatchInput(
-                id='demo-3',
-                homeTeam='Bayern Munich',
-                awayTeam='Borussia Dortmund',
-                league='Bundesliga',
-                time='17:45',
-                odds=1.70,
-                statusShort='FT',
-                homeScore=3,
-                awayScore=2,
-            ),
-            MatchInput(
-                id='demo-4',
-                homeTeam='Accra Hearts',
-                awayTeam='Asante Kotoko',
-                league='Ghana Premier League',
-                time='16:00',
-                odds=2.05,
-                statusShort='FT',
-                homeScore=0,
-                awayScore=1,
-            ),
-        ]
+        raise HTTPException(status_code=500, detail='API key is missing')
 
-    yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
-    url = f'https://v3.football.api-sports.io/fixtures?date={yesterday}&timezone=Africa/Accra'
-    print(f"Fetching yesterday fixtures for {yesterday}")
-    headers = {
-        'x-rapidapi-key': API_KEY,
-        'x-rapidapi-host': 'v3.football.api-sports.io',
-        'Accept': 'application/json',
-    }
-    response = requests.get(url, headers=headers, timeout=10)
-    print(f"API Response Status: {response.status_code}")
-    if response.status_code != 200:
-        error_msg = "Failed to fetch yesterday fixtures"
-        try:
-            error_data = response.json()
-            error_msg = error_data.get('message', error_msg)
-        except:
-            pass
-        raise HTTPException(status_code=502, detail=error_msg)
-
-    data = response.json().get('response', [])
+    yesterday = yesterday_accra_date()
+    url = f'{BASE_URL}/fixtures?date={yesterday}&timezone={TIMEZONE}'
+    payload = api_get(url)
     fixtures = []
-    for item in data:
+
+    for item in payload.get('response', []):
+        fixture = item.get('fixture', {})
+        status_short = fixture.get('status', {}).get('short')
+        if status_short != 'FT':
+            continue
+
         league = item.get('league', {})
         league_name = league.get('name', '')
         league_country = league.get('country', '')
-        status_short = item.get('fixture', {}).get('status', {}).get('short')
-        if status_short != 'FT':
-            continue  # Only finished matches for accuracy
-        fixture = item.get('fixture', {})
         teams = item.get('teams', {})
         goals = item.get('goals', {})
 
         fixtures.append(
             MatchInput(
-                id=str(fixture.get('id', f"{league_name}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}") ),
+                id=str(fixture.get('id', f"{league_name}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}")),
                 homeTeam=teams.get('home', {}).get('name', 'Home'),
                 awayTeam=teams.get('away', {}).get('name', 'Away'),
                 league=f"{league_name} - {league_country}" if league_country else league_name,
                 time=fixture.get('date', '')[:16],
-                odds=safe_float(item.get('odds', {}).get('home'), 1.85),
                 statusShort=status_short,
-                homeScore=goals.get('home', 0),
-                awayScore=goals.get('away', 0),
+                homeScore=safe_int(goals.get('home')),
+                awayScore=safe_int(goals.get('away')),
             )
         )
+
     return fixtures
 
 
 def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
-    API_KEY = os.getenv('VITE_SPORTS_API_KEY')
     if not API_KEY:
-        return [
-            MatchInput(
-                id='demo-today-1',
-                homeTeam='Chelsea',
-                awayTeam='Arsenal',
-                league='Premier League',
-                time=date_str + ' 18:30',
-                odds=1.92,
-                statusShort='NS',
-            ),
-            MatchInput(
-                id='demo-today-2',
-                homeTeam='Real Madrid',
-                awayTeam='Atletico Madrid',
-                league='La Liga',
-                time=date_str + ' 20:00',
-                odds=2.15,
-                statusShort='NS',
-            ),
-        ]
+        raise HTTPException(status_code=500, detail='API key is missing')
 
-    url = f'https://v3.football.api-sports.io/fixtures?date={date_str}&next=20&timezone=Africa/Accra'
-    print(f"Fetching fixtures for {date_str}")
-    headers = {
-        'x-rapidapi-key': API_KEY,
-        'x-rapidapi-host': 'v3.football.api-sports.io',
-        'Accept': 'application/json',
-    }
-    response = requests.get(url, headers=headers, timeout=10)
-    print(f"API Response Status: {response.status_code}")
-    if response.status_code != 200:
-        error_msg = "Failed to fetch fixtures for date"
-        try:
-            error_data = response.json()
-            error_msg = error_data.get('message', error_msg)
-        except:
-            pass
-        raise HTTPException(status_code=502, detail=error_msg)
-
-    data = response.json().get('response', [])
+    url = f'{BASE_URL}/fixtures?date={date_str}&timezone={TIMEZONE}'
+    payload = api_get(url)
     fixtures = []
-    for item in data:
+
+    for item in payload.get('response', []):
+        fixture = item.get('fixture', {})
         league = item.get('league', {})
         league_name = league.get('name', '')
         league_country = league.get('country', '')
-        fixture = item.get('fixture', {})
         teams = item.get('teams', {})
         goals = item.get('goals', {})
         status_short = fixture.get('status', {}).get('short')
@@ -319,12 +262,13 @@ def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
                 awayTeam=teams.get('away', {}).get('name', 'Away'),
                 league=f"{league_name} - {league_country}" if league_country else league_name,
                 time=fixture.get('date', '')[:16],
-                odds=safe_float(item.get('odds', {}).get('home'), 1.85),
                 statusShort=status_short,
-                homeScore=goals.get('home', 0),
-                awayScore=goals.get('away', 0),
+                homeScore=safe_int(goals.get('home')),
+                awayScore=safe_int(goals.get('away')),
             )
         )
+
+    print(f"Found {len(fixtures)} matches for {date_str} using Key {API_KEY[:4]}...")
     return fixtures
 
 
@@ -348,7 +292,7 @@ def root():
 
 @app.get('/predictions', response_model=dict)
 def predictions():
-    today = datetime.date.today().isoformat()
+    today = current_accra_date()
     matches = fetch_fixtures_by_date(today)
     prediction_list = [format_prediction_payload(match, generate_prediction(match)) for match in matches]
     return {"status": "success", "data": prediction_list}

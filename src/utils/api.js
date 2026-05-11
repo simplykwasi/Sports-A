@@ -1,6 +1,5 @@
 const API_HOST = 'v3.football.api-sports.io';
 const BASE_URL = `https://${API_HOST}`;
-const TOP_LEAGUES = new Set(['Premier League', 'La Liga', 'Bundesliga', 'Ghana Premier League']);
 const BACKEND_URL = "http://127.0.0.1:8000";
 
 function formatMatchTime(dateString) {
@@ -27,7 +26,8 @@ function mapApiFootballMatch(item) {
     homeScore: goals.home ?? null,
     awayScore: goals.away ?? null,
     league: league.name ?? 'Unknown League',
-    status: isLive ? 'live' : 'upcoming',
+    leagueName: league.name && league.country ? `${league.name} - ${league.country}` : league.name ?? 'Unknown League',
+    status: statusShort,
     statusShort,
     odds: Number(item.odds?.home) || 1.85,
     rawPayload: item,
@@ -44,6 +44,13 @@ function parsePercent(value) {
   if (typeof value === 'number') return value;
   const parsed = Number(String(value).replace(/[^0-9]/g, ''));
   return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function normalizeMatchStatus(status) {
+  if (status === 'NS') return 'Upcoming';
+  if (['1H', '2H', 'HT', 'ET', 'P'].includes(status)) return 'LIVE';
+  if (status === 'FT') return 'Finished';
+  return status || 'Upcoming';
 }
 
 function findStatValue(stats, keywords) {
@@ -88,9 +95,7 @@ export async function fetchDailyMatches() {
     throw new Error('Unexpected API-Football response format');
   }
 
-  return json.response
-    .filter((item) => TOP_LEAGUES.has(item.league?.name))
-    .map(mapApiFootballMatch);
+  return json.response.map(mapApiFootballMatch);
 }
 
 export async function fetchMatchDetails(matchId) {
@@ -145,7 +150,7 @@ export async function fetchYesterdayFixtures() {
   }
 
   return json.response
-    .filter((item) => TOP_LEAGUES.has(item.league?.name) && item.fixture?.status?.short === 'FT')
+    .filter((item) => item.fixture?.status?.short === 'FT')
     .map(mapApiFootballMatch);
 }
 
@@ -184,7 +189,10 @@ export async function fetchPredictions() {
       throw new Error('Prediction engine is warming up...');
     }
     const matches = json.data || [];
-    return matches;
+    return matches.map((match) => ({
+      ...match,
+      statusLabel: normalizeMatchStatus(match.status),
+    }));
   } catch (error) {
     console.error('Connection Error Details:', error);
     throw error;
