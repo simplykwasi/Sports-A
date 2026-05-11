@@ -46,7 +46,7 @@ function MatchRow({ match, onClick }) {
               <span className="text-slate-500">vs</span>
               <span className="truncate">{match.awayTeam}</span>
             </div>
-            <div className="text-xs text-slate-500 mt-0.5">{match.league}</div>
+            <div className="text-xs text-slate-500 mt-0.5">{match.leagueName}</div>
           </div>
         </div>
 

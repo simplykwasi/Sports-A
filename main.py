@@ -7,12 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-TOP_LEAGUES = {
-    'Premier League',
-    'La Liga',
-    'Bundesliga',
-    'Ghana Premier League',
-}
+TOP_LEAGUES = set()  # Removed hardcoded filters to fetch globally
 
 app = FastAPI(title='Sports Predictor Brain')
 app.add_middleware(
@@ -217,33 +212,43 @@ def fetch_yesterday_fixtures() -> List[MatchInput]:
         ]
 
     yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
-    url = f'https://v3.football.api-sports.io/fixtures?date={yesterday}'
+    url = f'https://v3.football.api-sports.io/fixtures?date={yesterday}&timezone=Africa/Accra'
+    print(f"Fetching yesterday fixtures for {yesterday}")
     headers = {
         'x-rapidapi-key': API_KEY,
         'x-rapidapi-host': 'v3.football.api-sports.io',
         'Accept': 'application/json',
     }
     response = requests.get(url, headers=headers, timeout=10)
+    print(f"API Response Status: {response.status_code}")
     if response.status_code != 200:
-        raise HTTPException(status_code=502, detail='Failed to fetch yesterday fixtures')
+        error_msg = "Failed to fetch yesterday fixtures"
+        try:
+            error_data = response.json()
+            error_msg = error_data.get('message', error_msg)
+        except:
+            pass
+        raise HTTPException(status_code=502, detail=error_msg)
 
     data = response.json().get('response', [])
     fixtures = []
     for item in data:
-        league = item.get('league', {}).get('name')
+        league = item.get('league', {})
+        league_name = league.get('name', '')
+        league_country = league.get('country', '')
         status_short = item.get('fixture', {}).get('status', {}).get('short')
-        if league not in TOP_LEAGUES or status_short != 'FT':
-            continue
+        if status_short != 'FT':
+            continue  # Only finished matches for accuracy
         fixture = item.get('fixture', {})
         teams = item.get('teams', {})
         goals = item.get('goals', {})
 
         fixtures.append(
             MatchInput(
-                id=str(fixture.get('id', f"{league}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}") ),
+                id=str(fixture.get('id', f"{league_name}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}") ),
                 homeTeam=teams.get('home', {}).get('name', 'Home'),
                 awayTeam=teams.get('away', {}).get('name', 'Away'),
-                league=league,
+                league=f"{league_name} - {league_country}" if league_country else league_name,
                 time=fixture.get('date', '')[:16],
                 odds=safe_float(item.get('odds', {}).get('home'), 1.85),
                 statusShort=status_short,
@@ -278,23 +283,30 @@ def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
             ),
         ]
 
-    url = f'https://v3.football.api-sports.io/fixtures?date={date_str}&next=20'
+    url = f'https://v3.football.api-sports.io/fixtures?date={date_str}&next=20&timezone=Africa/Accra'
+    print(f"Fetching fixtures for {date_str}")
     headers = {
         'x-rapidapi-key': API_KEY,
         'x-rapidapi-host': 'v3.football.api-sports.io',
         'Accept': 'application/json',
     }
     response = requests.get(url, headers=headers, timeout=10)
+    print(f"API Response Status: {response.status_code}")
     if response.status_code != 200:
-        raise HTTPException(status_code=502, detail='Failed to fetch fixtures for date')
+        error_msg = "Failed to fetch fixtures for date"
+        try:
+            error_data = response.json()
+            error_msg = error_data.get('message', error_msg)
+        except:
+            pass
+        raise HTTPException(status_code=502, detail=error_msg)
 
     data = response.json().get('response', [])
     fixtures = []
     for item in data:
-        league = item.get('league', {}).get('name')
-        if league not in TOP_LEAGUES:
-            continue
-
+        league = item.get('league', {})
+        league_name = league.get('name', '')
+        league_country = league.get('country', '')
         fixture = item.get('fixture', {})
         teams = item.get('teams', {})
         goals = item.get('goals', {})
@@ -302,10 +314,10 @@ def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
 
         fixtures.append(
             MatchInput(
-                id=str(fixture.get('id', f"{league}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}")),
+                id=str(fixture.get('id', f"{league_name}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}")),
                 homeTeam=teams.get('home', {}).get('name', 'Home'),
                 awayTeam=teams.get('away', {}).get('name', 'Away'),
-                league=league,
+                league=f"{league_name} - {league_country}" if league_country else league_name,
                 time=fixture.get('date', '')[:16],
                 odds=safe_float(item.get('odds', {}).get('home'), 1.85),
                 statusShort=status_short,
@@ -321,6 +333,7 @@ def format_prediction_payload(match: MatchInput, prediction: PredictionOutput) -
         "id": match.id,
         "homeTeam": match.homeTeam,
         "awayTeam": match.awayTeam,
+        "leagueName": match.league,
         "prediction": prediction.recommendedBet,
         "confidence": prediction.confidence,
         "status": match.statusShort or 'NS',

@@ -151,7 +151,7 @@ function Dashboard() {
                         <div className="text-white font-medium">
                           {bet.homeTeam} vs {bet.awayTeam}
                         </div>
-                        <div className="text-xs text-slate-500">{bet.league}</div>
+                        <div className="text-xs text-slate-500">{bet.leagueName}</div>
                       </div>
                     </div>
 
