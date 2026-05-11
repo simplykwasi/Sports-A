@@ -17,7 +17,7 @@ TOP_LEAGUES = {
 app = FastAPI(title='Sports Predictor Brain')
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -257,14 +257,14 @@ def fetch_yesterday_fixtures() -> List[MatchInput]:
 @app.post('/predict', response_model=dict)
 def predict(request: PredictRequest):
     predictions = [generate_prediction(match) for match in request.matches]
-    return {'predictions': predictions}
+    return {"success": True, "data": predictions}
 
 
-@app.get('/accuracy', response_model=AccuracyResponse)
+@app.get('/accuracy', response_model=dict)
 def accuracy():
     matches = fetch_yesterday_fixtures()
     if not matches:
-        return AccuracyResponse(hitRate=0, hitCount=0, totalMatches=0, details=[])
+        return {"success": True, "data": {"hitRate": 0, "hitCount": 0, "totalMatches": 0, "details": []}}
 
     details = []
     hits = 0
@@ -288,10 +288,13 @@ def accuracy():
         )
 
     hit_rate = int(round((hits / len(details)) * 100)) if details else 0
-    return AccuracyResponse(hitRate=hit_rate, hitCount=hits, totalMatches=len(details), details=details)
+    data = AccuracyResponse(hitRate=hit_rate, hitCount=hits, totalMatches=len(details), details=details)
+    return {"success": True, "data": data.dict()}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import uvicorn
+    
+    uvicorn.run(app, host="127.0.0.1", port=8000)
 
-    uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)
+    

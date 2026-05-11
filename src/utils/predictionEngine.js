@@ -1,4 +1,4 @@
-const BACKEND_BASE_URL = window.location.hostname === 'localhost' ? 'http://127.0.0.1:8000' : (import.meta.env.VITE_PYTHON_BACKEND_URL || 'https://your-deployed-python-url.com');
+const BACKEND_BASE_URL = 'http://127.0.0.1:8000';
 
 function normalizeMatchInput(match) {
   return {
@@ -39,14 +39,20 @@ export class PredictionEngine {
   }
 
   static async fetchAccuracy() {
-    const response = await fetch(`${BACKEND_BASE_URL}/accuracy`);
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Accuracy service failed (${response.status}): ${body}`);
-    }
+    console.log("Full Backend URL:", `${BACKEND_BASE_URL}/accuracy`);
+    try {
+      const response = await fetch(`${BACKEND_BASE_URL}/accuracy`);
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(`Accuracy service failed (${response.status}): ${body}`);
+      }
 
-    const json = await response.json();
-    return json;
+      const json = await response.json();
+      return json;
+    } catch (error) {
+      console.error("Connection Error Details:", error);
+      throw error;
+    }
   }
 
   static isValueBet(prediction, odds) {

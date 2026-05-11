@@ -1,7 +1,7 @@
 const API_HOST = 'v3.football.api-sports.io';
 const BASE_URL = `https://${API_HOST}`;
 const TOP_LEAGUES = new Set(['Premier League', 'La Liga', 'Bundesliga', 'Ghana Premier League']);
-const BACKEND_URL = "http://0.0.0.0:8000";
+const BACKEND_URL = "http://127.0.0.1:8000";
 
 function formatMatchTime(dateString) {
   if (!dateString) return 'TBD';

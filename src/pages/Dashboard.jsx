@@ -55,7 +55,7 @@ function Dashboard() {
 
   useEffect(() => {
     loadData(true);
-  }, [loadData]);
+  }, []);
 
   useEffect(() => {
     if (!matches.some((match) => ['1H', '2H', 'HT'].includes(match.statusShort))) {
