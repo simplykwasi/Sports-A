@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import MatchRow from '../components/MatchRow';
 import AccuracyBanner from '../components/AccuracyBanner';
-import { fetchDailyMatches } from '../utils/api';
-import { PredictionEngine } from '../utils/predictionEngine';
+import { fetchPredictions } from '../utils/api';
 
 function Dashboard() {
   const [matches, setMatches] = useState([]);
@@ -23,22 +22,16 @@ function Dashboard() {
     setError(null);
 
     try {
-      const rawMatches = await fetchDailyMatches();
-      const predictions = await PredictionEngine.fetchPredictions(rawMatches);
-      const predictionById = new Map(predictions.map((item) => [String(item.id), item]));
-
-      const enrichedMatches = rawMatches.map((match) => {
-        const prediction = predictionById.get(String(match.id)) ?? null;
-        return {
-          ...match,
-          prediction,
-          isValueBet: prediction ? PredictionEngine.isValueBet(prediction, match.odds) : false,
-        };
-      });
+      const rawMatches = await fetchPredictions();
+      const matches = rawMatches || [];
+      const enrichedMatches = matches.map((match) => ({
+        ...match,
+        isValueBet: (match.confidence || 0) > 75,
+      }));
 
       const topValueBets = enrichedMatches
         .filter((match) => match.isValueBet)
-        .sort((a, b) => (b.prediction?.confidence ?? 0) - (a.prediction?.confidence ?? 0))
+        .sort((a, b) => (b.confidence || 0) - (a.confidence || 0))
         .slice(0, 5);
 
       setMatches(enrichedMatches);
@@ -58,7 +51,7 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (!matches.some((match) => ['1H', '2H', 'HT'].includes(match.statusShort))) {
+    if (!matches.some((match) => match.status === 'LIVE')) {
       return undefined;
     }
 
@@ -86,10 +79,10 @@ function Dashboard() {
     );
   }
 
-  const liveStatuses = new Set(['1H', '2H', 'HT']);
+  const liveStatuses = new Set(['LIVE']);
   const filteredMatches = matches.filter((match) => {
     if (activeFilter === 'Live') {
-      return liveStatuses.has(match.statusShort);
+      return liveStatuses.has(match.status);
     }
     return true;
   });
@@ -164,8 +157,8 @@ function Dashboard() {
 
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <div className="text-emerald-500 font-bold">{bet.prediction?.recommendedBet || 'Prediction'}</div>
-                        <div className="text-xs text-slate-400">{bet.prediction?.confidence}% confidence</div>
+                        <div className="text-emerald-500 font-bold">{bet.prediction || 'Prediction'}</div>
+                        <div className="text-xs text-slate-400">{bet.confidence}% confidence</div>
                       </div>
                       <div className="text-lg font-bold text-emerald-500">{bet.odds}</div>
                     </div>

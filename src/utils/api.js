@@ -159,7 +159,11 @@ export async function fetchAccuracy() {
       throw new Error(`Accuracy service failed (${response.status}): ${body}`);
     }
     const json = await response.json();
-    return json.data;
+    if (json.status === 'error') {
+      throw new Error('Prediction engine is warming up...');
+    }
+    const matches = json.data || [];
+    return matches;
   } catch (error) {
     console.error('Connection Error Details:', error);
     throw error;
@@ -176,7 +180,11 @@ export async function fetchPredictions() {
       throw new Error(`Prediction service failed (${response.status}): ${body}`);
     }
     const json = await response.json();
-    return json.data;
+    if (json.status === 'error') {
+      throw new Error('Prediction engine is warming up...');
+    }
+    const matches = json.data || [];
+    return matches;
   } catch (error) {
     console.error('Connection Error Details:', error);
     throw error;

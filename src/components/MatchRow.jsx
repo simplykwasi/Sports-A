@@ -1,8 +1,11 @@
 import { Clock, TrendingUp, Target } from 'lucide-react';
 
 function MatchRow({ match, onClick }) {
-  const isLive = match.status === 'live';
+  const isLive = match.status === 'LIVE' || match.status === 'live';
   const isValueBet = match.isValueBet;
+  const predictionLabel = match.prediction || 'Prediction';
+  const predictionConfidence = match.confidence || 0;
+  const [homeScore, awayScore] = match.score?.split('-').map((value) => value.trim()) || [0, 0];
 
   const getPredictionIcon = (type) => {
     switch (type) {
@@ -50,18 +53,18 @@ function MatchRow({ match, onClick }) {
         {/* Score (if live) */}
         {isLive && (
           <div className="flex items-center gap-2 text-lg font-bold text-white mx-4">
-            <span className="text-amber-500">{match.homeScore}</span>
+            <span className="text-amber-500">{homeScore}</span>
             <span className="text-slate-500">-</span>
-            <span className="text-amber-500">{match.awayScore}</span>
+            <span className="text-amber-500">{awayScore}</span>
           </div>
         )}
 
         {/* Prediction Badge */}
         {match.prediction && (
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-white text-sm font-medium ${getPredictionColor(match.prediction.type)}`}>
-            {getPredictionIcon(match.prediction.type)}
-            <span className="hidden sm:inline">{match.prediction.type}</span>
-            <span className="text-xs opacity-90">{match.prediction.confidence}%</span>
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-white text-sm font-medium ${getPredictionColor()}`}>
+            {getPredictionIcon(predictionLabel)}
+            <span className="hidden sm:inline">{predictionLabel}</span>
+            <span className="text-xs opacity-90">{predictionConfidence}%</span>
           </div>
         )}
       </div>

@@ -316,6 +316,18 @@ def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
     return fixtures
 
 
+def format_prediction_payload(match: MatchInput, prediction: PredictionOutput) -> dict:
+    return {
+        "id": match.id,
+        "homeTeam": match.homeTeam,
+        "awayTeam": match.awayTeam,
+        "prediction": prediction.recommendedBet,
+        "confidence": prediction.confidence,
+        "status": match.statusShort or 'NS',
+        "score": f"{match.homeScore or 0}-{match.awayScore or 0}",
+    }
+
+
 @app.get('/')
 def root():
     return {"message": "Server is running"}
@@ -325,8 +337,8 @@ def root():
 def predictions():
     today = datetime.date.today().isoformat()
     matches = fetch_fixtures_by_date(today)
-    prediction_list = [generate_prediction(match).dict() for match in matches]
-    return {"success": True, "data": prediction_list}
+    prediction_list = [format_prediction_payload(match, generate_prediction(match)) for match in matches]
+    return {"status": "success", "data": prediction_list}
 
 
 @app.post('/predict', response_model=dict)
@@ -339,8 +351,9 @@ def predict(request: PredictRequest):
 def accuracy():
     matches = fetch_yesterday_fixtures()
     if not matches:
-        return {"success": True, "data": {"hitRate": 0, "hitCount": 0, "totalMatches": 0, "details": []}}
+        return {"status": "success", "data": [], "details": [], "hitRate": 0, "hitCount": 0, "totalMatches": 0}
 
+    results = []
     details = []
     hits = 0
     for match in matches:
@@ -349,6 +362,8 @@ def accuracy():
         success = is_hit(prediction.recommendedBet, match)
         if success:
             hits += 1
+
+        results.append(format_prediction_payload(match, prediction))
         details.append(
             AccuracyRow(
                 id=match.id,
@@ -362,9 +377,15 @@ def accuracy():
             )
         )
 
-    hit_rate = int(round((hits / len(details)) * 100)) if details else 0
-    data = AccuracyResponse(hitRate=hit_rate, hitCount=hits, totalMatches=len(details), details=details)
-    return {"success": True, "data": data.dict()}
+    hit_rate = int(round((hits / len(results)) * 100)) if results else 0
+    return {
+        "status": "success",
+        "data": results,
+        "details": [row.dict() for row in details],
+        "hitRate": hit_rate,
+        "hitCount": hits,
+        "totalMatches": len(results),
+    }
 
 
 if __name__ == "__main__":
