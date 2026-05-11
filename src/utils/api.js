@@ -16,7 +16,6 @@ function mapApiFootballMatch(item) {
   const league = item.league ?? {};
 
   const statusShort = status.short ?? 'NS';
-  const isLive = ['1H', '2H', 'HT', 'ET', 'P'].includes(statusShort);
 
   return {
     id: fixture.id ?? `${league.name}-${teams.home?.name}-${teams.away?.name}-${fixture.timestamp}`,
@@ -69,6 +68,23 @@ function makeRequest(url) {
       Accept: 'application/json',
     },
   });
+}
+
+async function fetchWithTimeout(url, options = {}, timeout = 5000) {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    return response;
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Request timed out after 5 seconds');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function fetchDailyMatches() {
@@ -179,7 +195,7 @@ export async function fetchPredictions() {
   const url = `${BACKEND_URL}/predictions`;
   console.log('Full Backend URL:', url);
   try {
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url, {}, 5000);
     if (!response.ok) {
       const body = await response.text();
       throw new Error(`Prediction service failed (${response.status}): ${body}`);

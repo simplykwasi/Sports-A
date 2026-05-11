@@ -12,19 +12,27 @@ function Dashboard() {
   const [valueBets, setValueBets] = useState([]);
   const [activeFilter, setActiveFilter] = useState('All');
   const [loading, setLoading] = useState(true);
+  const [statusMessage, setStatusMessage] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const loadData = useCallback(async (showLoading = true) => {
     if (showLoading) {
       setLoading(true);
+      setStatusMessage('Connecting to Python Server...');
     }
     setError(null);
 
     try {
+      setStatusMessage('Fetching predictions...');
       const rawMatches = await fetchPredictions();
-      const matches = rawMatches || [];
-      const enrichedMatches = matches.map((match) => ({
+      const validatedMatches = Array.isArray(rawMatches) ? rawMatches : [];
+      if (!Array.isArray(rawMatches)) {
+        setMatches([]);
+      }
+      setStatusMessage('Parsing matches...');
+
+      const enrichedMatches = validatedMatches.map((match) => ({
         ...match,
         isValueBet: (match.confidence || 0) > 75,
       }));
@@ -43,12 +51,13 @@ function Dashboard() {
       if (showLoading) {
         setLoading(false);
       }
+      setStatusMessage('');
     }
   }, []);
 
   useEffect(() => {
     loadData(true);
-  }, []);
+  }, [loadData]);
 
   useEffect(() => {
     if (!matches.some((match) => match.status === 'LIVE')) {
@@ -73,7 +82,7 @@ function Dashboard() {
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin" />
-          <div className="text-white text-sm">Fetching today's live matches...</div>
+          <div className="text-white text-sm">{statusMessage || 'Fetching today\'s live matches...'}</div>
         </div>
       </div>
     );
