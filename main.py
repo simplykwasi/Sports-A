@@ -167,8 +167,8 @@ def is_hit(recommended_bet: str, match: MatchInput) -> bool:
 
 
 def fetch_yesterday_fixtures() -> List[MatchInput]:
-    api_key = os.environ.get('SPORTS_API_KEY') or os.environ.get('VITE_SPORTS_API_KEY')
-    if not api_key:
+    API_KEY = os.getenv('VITE_SPORTS_API_KEY')
+    if not API_KEY:
         return [
             MatchInput(
                 id='demo-1',
@@ -219,7 +219,7 @@ def fetch_yesterday_fixtures() -> List[MatchInput]:
     yesterday = (datetime.date.today() - datetime.timedelta(days=1)).isoformat()
     url = f'https://v3.football.api-sports.io/fixtures?date={yesterday}'
     headers = {
-        'x-rapidapi-key': api_key,
+        'x-rapidapi-key': API_KEY,
         'x-rapidapi-host': 'v3.football.api-sports.io',
         'Accept': 'application/json',
     }
@@ -255,8 +255,8 @@ def fetch_yesterday_fixtures() -> List[MatchInput]:
 
 
 def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
-    api_key = os.environ.get('SPORTS_API_KEY') or os.environ.get('VITE_SPORTS_API_KEY')
-    if not api_key:
+    API_KEY = os.getenv('VITE_SPORTS_API_KEY')
+    if not API_KEY:
         return [
             MatchInput(
                 id='demo-today-1',
@@ -278,9 +278,9 @@ def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
             ),
         ]
 
-    url = f'https://v3.football.api-sports.io/fixtures?date={date_str}'
+    url = f'https://v3.football.api-sports.io/fixtures?date={date_str}&next=20'
     headers = {
-        'x-rapidapi-key': api_key,
+        'x-rapidapi-key': API_KEY,
         'x-rapidapi-host': 'v3.football.api-sports.io',
         'Accept': 'application/json',
     }
