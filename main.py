@@ -254,6 +254,81 @@ def fetch_yesterday_fixtures() -> List[MatchInput]:
     return fixtures
 
 
+def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
+    api_key = os.environ.get('SPORTS_API_KEY') or os.environ.get('VITE_SPORTS_API_KEY')
+    if not api_key:
+        return [
+            MatchInput(
+                id='demo-today-1',
+                homeTeam='Chelsea',
+                awayTeam='Arsenal',
+                league='Premier League',
+                time=date_str + ' 18:30',
+                odds=1.92,
+                statusShort='NS',
+            ),
+            MatchInput(
+                id='demo-today-2',
+                homeTeam='Real Madrid',
+                awayTeam='Atletico Madrid',
+                league='La Liga',
+                time=date_str + ' 20:00',
+                odds=2.15,
+                statusShort='NS',
+            ),
+        ]
+
+    url = f'https://v3.football.api-sports.io/fixtures?date={date_str}'
+    headers = {
+        'x-rapidapi-key': api_key,
+        'x-rapidapi-host': 'v3.football.api-sports.io',
+        'Accept': 'application/json',
+    }
+    response = requests.get(url, headers=headers, timeout=10)
+    if response.status_code != 200:
+        raise HTTPException(status_code=502, detail='Failed to fetch fixtures for date')
+
+    data = response.json().get('response', [])
+    fixtures = []
+    for item in data:
+        league = item.get('league', {}).get('name')
+        if league not in TOP_LEAGUES:
+            continue
+
+        fixture = item.get('fixture', {})
+        teams = item.get('teams', {})
+        goals = item.get('goals', {})
+        status_short = fixture.get('status', {}).get('short')
+
+        fixtures.append(
+            MatchInput(
+                id=str(fixture.get('id', f"{league}-{teams.get('home', {}).get('name')}-{teams.get('away', {}).get('name')}-{fixture.get('timestamp')}")),
+                homeTeam=teams.get('home', {}).get('name', 'Home'),
+                awayTeam=teams.get('away', {}).get('name', 'Away'),
+                league=league,
+                time=fixture.get('date', '')[:16],
+                odds=safe_float(item.get('odds', {}).get('home'), 1.85),
+                statusShort=status_short,
+                homeScore=goals.get('home', 0),
+                awayScore=goals.get('away', 0),
+            )
+        )
+    return fixtures
+
+
+@app.get('/')
+def root():
+    return {"message": "Server is running"}
+
+
+@app.get('/predictions', response_model=dict)
+def predictions():
+    today = datetime.date.today().isoformat()
+    matches = fetch_fixtures_by_date(today)
+    prediction_list = [generate_prediction(match).dict() for match in matches]
+    return {"success": True, "data": prediction_list}
+
+
 @app.post('/predict', response_model=dict)
 def predict(request: PredictRequest):
     predictions = [generate_prediction(match) for match in request.matches]

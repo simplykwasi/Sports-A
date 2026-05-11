@@ -149,6 +149,40 @@ export async function fetchYesterdayFixtures() {
     .map(mapApiFootballMatch);
 }
 
+export async function fetchAccuracy() {
+  const url = `${BACKEND_URL}/accuracy`;
+  console.log('Full Backend URL:', url);
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Accuracy service failed (${response.status}): ${body}`);
+    }
+    const json = await response.json();
+    return json.data;
+  } catch (error) {
+    console.error('Connection Error Details:', error);
+    throw error;
+  }
+}
+
+export async function fetchPredictions() {
+  const url = `${BACKEND_URL}/predictions`;
+  console.log('Full Backend URL:', url);
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Prediction service failed (${response.status}): ${body}`);
+    }
+    const json = await response.json();
+    return json.data;
+  } catch (error) {
+    console.error('Connection Error Details:', error);
+    throw error;
+  }
+}
+
 export async function fetchMatchStatistics(fixtureId) {
   const apiKey = import.meta.env.VITE_SPORTS_API_KEY;
   if (!apiKey) {
