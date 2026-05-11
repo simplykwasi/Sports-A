@@ -30,7 +30,7 @@ def api_get(url: str) -> dict:
         'Accept': 'application/json',
     }
     print(f"Requesting API-Football: {url}")
-    response = requests.get(url, headers=headers, timeout=10)
+    response = requests.get(url, headers=headers, timeout=15)
     print(f"API Response Status: {response.status_code}")
 
     if response.status_code != 200:
@@ -285,12 +285,14 @@ def fetch_fixtures_by_date(date_str: str) -> List[MatchInput]:
 
 def map_status_label(status_short: Optional[str]) -> str:
     if status_short == 'NS':
-        return 'Upcoming'
-    if status_short in {'1H', '2H', 'HT', 'ET', 'P'}:
-        return 'LIVE'
+        return 'Scheduled'
+    if status_short == 'HT':
+        return 'Half-Time'
+    if status_short in {'1H', '2H', 'ET', 'P'}:
+        return 'Live'
     if status_short == 'FT':
         return 'Finished'
-    return status_short or 'Upcoming'
+    return status_short or 'Scheduled'
 
 
 def format_prediction_payload(match: MatchInput, prediction: PredictionOutput) -> dict:
@@ -313,9 +315,15 @@ def root():
     return {"message": "Server is running"}
 
 
+@app.get('/health')
+def health():
+    return {"status": "ok"}
+
+
 @app.get('/predictions', response_model=dict)
 def predictions():
     today = current_accra_date()
+    print(f"Fetching matches for {today}...")
     matches = fetch_fixtures_by_date(today)
     prediction_list = [format_prediction_payload(match, generate_prediction(match)) for match in matches]
     return {"status": "success", "data": prediction_list}

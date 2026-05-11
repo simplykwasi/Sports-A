@@ -14,25 +14,27 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState('');
   const [error, setError] = useState(null);
+  const [isTimeout, setIsTimeout] = useState(false);
   const navigate = useNavigate();
 
   const loadData = useCallback(async (showLoading = true) => {
     if (showLoading) {
       setLoading(true);
       setStatusMessage('Connecting to Python Server...');
+      setIsTimeout(false);
     }
     setError(null);
 
     try {
       setStatusMessage('Fetching predictions...');
       const rawMatches = await fetchPredictions();
-      const validatedMatches = Array.isArray(rawMatches) ? rawMatches : [];
       if (!Array.isArray(rawMatches)) {
         setMatches([]);
+        return;
       }
       setStatusMessage('Parsing matches...');
 
-      const enrichedMatches = validatedMatches.map((match) => ({
+      const enrichedMatches = rawMatches.map((match) => ({
         ...match,
         isValueBet: (match.confidence || 0) > 75,
       }));
@@ -46,7 +48,13 @@ function Dashboard() {
       setValueBets(topValueBets);
       console.log('Matches state:', enrichedMatches);
     } catch (fetchError) {
-      setError(fetchError.message || 'Unable to load live matches.');
+      const errorMsg = fetchError.message || 'Unable to load live matches.';
+      if (errorMsg.includes('timed out') || errorMsg.includes('timeout')) {
+        setIsTimeout(true);
+        setError('Connection timed out. Please ensure the Python server is running on http://127.0.0.1:8000');
+      } else {
+        setError(errorMsg);
+      }
     } finally {
       if (showLoading) {
         setLoading(false);
@@ -124,6 +132,15 @@ function Dashboard() {
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 mb-6 text-slate-100">
             <div className="font-semibold">Unable to load live data</div>
             <p className="text-sm text-slate-200">{error}</p>
+            {isTimeout && (
+              <button
+                type="button"
+                onClick={() => loadData(true)}
+                className="mt-3 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm rounded-lg transition-colors"
+              >
+                Retry
+              </button>
+            )}
           </div>
         ) : null}
 

@@ -1,6 +1,6 @@
 const API_HOST = 'v3.football.api-sports.io';
 const BASE_URL = `https://${API_HOST}`;
-const BACKEND_URL = "http://127.0.0.1:8000";
+const BACKEND_URL = 'http://127.0.0.1:8000';
 
 function formatMatchTime(dateString) {
   if (!dateString) return 'TBD';
@@ -70,7 +70,7 @@ function makeRequest(url) {
   });
 }
 
-async function fetchWithTimeout(url, options = {}, timeout = 5000) {
+async function fetchWithTimeout(url, options = {}, timeout = 20000) {
   const controller = new AbortController();
   const timer = window.setTimeout(() => controller.abort(), timeout);
 
@@ -79,7 +79,7 @@ async function fetchWithTimeout(url, options = {}, timeout = 5000) {
     return response;
   } catch (error) {
     if (error.name === 'AbortError') {
-      throw new Error('Request timed out after 5 seconds');
+      throw new Error('Request timed out after 20 seconds');
     }
     throw error;
   } finally {
@@ -195,7 +195,7 @@ export async function fetchPredictions() {
   const url = `${BACKEND_URL}/predictions`;
   console.log('Full Backend URL:', url);
   try {
-    const response = await fetchWithTimeout(url, {}, 5000);
+    const response = await fetchWithTimeout(url, {}, 20000);
     if (!response.ok) {
       const body = await response.text();
       throw new Error(`Prediction service failed (${response.status}): ${body}`);
