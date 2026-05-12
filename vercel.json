@@ -12,6 +12,10 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "dest": "/main.py"
+    },
+    {
       "src": "/(predictions|accuracy|health|api/.*)",
       "dest": "/main.py"
     },

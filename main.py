@@ -16,7 +16,14 @@ TIMEZONE = 'Africa/Accra'
 # Supabase initialization
 SUPABASE_URL = os.getenv('VITE_SUPABASE_URL', 'https://sijynfgkrcnhgmaqdcav.supabase.co')
 SUPABASE_KEY = os.getenv('VITE_SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpanluZmdrcmNuaGdtYXFkY2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMTUwMDcsImV4cCI6MjA5MzU5MTAwN30.BUb1FNtJARVAOVQMDo479KFtlbNcf5-EZe7f3XYWOxI')
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+supabase: Optional[Client] = None
+try:
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    print("Supabase client initialized successfully")
+except Exception as e:
+    print(f"Warning: Supabase initialization failed: {e}")
+    supabase = None
 
 app = FastAPI(title='Sports Predictor Brain')
 app.add_middleware(
@@ -303,6 +310,10 @@ def map_status_label(status_short: Optional[str]) -> str:
 
 def sync_fixtures() -> None:
     """Fetch today's matches from API-Football and sync to Supabase."""
+    if not supabase:
+        print("Warning: Supabase client not initialized. Skipping sync.")
+        return
+    
     try:
         today = current_accra_date()
         print(f"Syncing fixtures for {today}...")
@@ -343,6 +354,10 @@ def sync_fixtures() -> None:
 
 def should_sync_fixtures() -> bool:
     """Check if fixtures were updated in the last 30 minutes."""
+    if not supabase:
+        print("Warning: Supabase client not initialized. Skipping sync check.")
+        return False
+    
     try:
         today = current_accra_date()
         
@@ -386,7 +401,7 @@ def format_prediction_payload(match: MatchInput, prediction: PredictionOutput) -
 
 @app.get('/')
 def root():
-    return {"message": "Server is running"}
+    return {"status": "ready"}
 
 
 @app.get('/health')
@@ -397,6 +412,13 @@ def health():
 @app.get('/predictions', response_model=dict)
 def predictions():
     """Query predictions from Supabase. Auto-syncs if data is stale (>30 min old)."""
+    if not supabase:
+        return {
+            "status": "error",
+            "data": [],
+            "message": "Supabase client not initialized. Check environment variables."
+        }
+    
     try:
         # Check if we need to sync fresh data from API
         if should_sync_fixtures():
@@ -479,10 +501,7 @@ def accuracy():
         "totalMatches": len(results),
     }
 
-
 if __name__ == "__main__":
+    # Only run locally for development
     import uvicorn
-    
     uvicorn.run(app, host="127.0.0.1", port=8000)
-
-    
