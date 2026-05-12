@@ -14,11 +14,14 @@ BASE_URL = 'https://v3.football.api-sports.io'
 TIMEZONE = 'Africa/Accra'
 
 # Supabase initialization
-SUPABASE_URL = os.getenv('VITE_SUPABASE_URL', 'https://sijynfgkrcnhgmaqdcav.supabase.co')
-SUPABASE_KEY = os.getenv('VITE_SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpanluZmdrcmNuaGdtYXFkY2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMTUwMDcsImV4cCI6MjA5MzU5MTAwN30.BUb1FNtJARVAOVQMDo479KFtlbNcf5-EZe7f3XYWOxI')
+SUPABASE_URL = os.getenv('VITE_SUPABASE_URL', '').strip() or 'https://sijynfgkrcnhgmaqdcav.supabase.co'
+SUPABASE_KEY = os.getenv('VITE_SUPABASE_ANON_KEY', '').strip() or 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpanluZmdrcmNuaGdtYXFkY2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMTUwMDcsImV4cCI6MjA5MzU5MTAwN30.BUb1FNtJARVAOVQMDo479KFtlbNcf5-EZe7f3XYWOxI'
 
 supabase: Optional[Client] = None
 try:
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        raise Exception("Missing Supabase Credentials: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY are not set")
+    
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     print("Supabase client initialized successfully")
 except Exception as e:
