@@ -45,13 +45,6 @@ function parsePercent(value) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
-function normalizeMatchStatus(status) {
-  if (status === 'NS') return 'Upcoming';
-  if (['1H', '2H', 'HT', 'ET', 'P'].includes(status)) return 'LIVE';
-  if (status === 'FT') return 'Finished';
-  return status || 'Upcoming';
-}
-
 function findStatValue(stats, keywords) {
   const stat = stats.find((item) => {
     const type = String(item.type ?? '').toLowerCase();
@@ -68,23 +61,6 @@ function makeRequest(url) {
       Accept: 'application/json',
     },
   });
-}
-
-async function fetchWithTimeout(url, options = {}, timeout = 20000) {
-  const controller = new AbortController();
-  const timer = window.setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    return response;
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      throw new Error('Request timed out after 20 seconds');
-    }
-    throw error;
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 export async function fetchDailyMatches() {
@@ -193,22 +169,20 @@ export async function fetchAccuracy() {
 
 export async function fetchPredictions() {
   const url = `${BACKEND_URL}/predictions`;
-  console.log('Full Backend URL:', url);
+  console.log('Fetching predictions from backend:', url);
   try {
-    const response = await fetchWithTimeout(url, {}, 20000);
+    // Use standard fetch since database queries are nearly instant
+    const response = await fetch(url);
     if (!response.ok) {
       const body = await response.text();
       throw new Error(`Prediction service failed (${response.status}): ${body}`);
     }
     const json = await response.json();
     if (json.status === 'error') {
-      throw new Error('Prediction engine is warming up...');
+      throw new Error(json.message || 'Prediction engine error');
     }
     const matches = json.data || [];
-    return matches.map((match) => ({
-      ...match,
-      statusLabel: normalizeMatchStatus(match.status),
-    }));
+    return Array.isArray(matches) ? matches : [];
   } catch (error) {
     console.error('Connection Error Details:', error);
     throw error;

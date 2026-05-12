@@ -7,10 +7,16 @@ import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from supabase import create_client, Client
 
 API_KEY = os.getenv('API_FOOTBALL_API_KEY', '3041353cf06b3eb32032dc0a68762f98')
 BASE_URL = 'https://v3.football.api-sports.io'
 TIMEZONE = 'Africa/Accra'
+
+# Supabase initialization
+SUPABASE_URL = os.getenv('VITE_SUPABASE_URL', 'https://sijynfgkrcnhgmaqdcav.supabase.co')
+SUPABASE_KEY = os.getenv('VITE_SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpanluZmdrcmNuaGdtYXFkY2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMTUwMDcsImV4cCI6MjA5MzU5MTAwN30.BUb1FNtJARVAOVQMDo479KFtlbNcf5-EZe7f3XYWOxI')
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = FastAPI(title='Sports Predictor Brain')
 app.add_middleware(
@@ -289,10 +295,78 @@ def map_status_label(status_short: Optional[str]) -> str:
     if status_short == 'HT':
         return 'Half-Time'
     if status_short in {'1H', '2H', 'ET', 'P'}:
-        return 'Live'
+        return 'LIVE'
     if status_short == 'FT':
         return 'Finished'
     return status_short or 'Scheduled'
+
+
+def sync_fixtures() -> None:
+    """Fetch today's matches from API-Football and sync to Supabase."""
+    try:
+        today = current_accra_date()
+        print(f"Syncing fixtures for {today}...")
+        
+        matches = fetch_fixtures_by_date(today)
+        
+        if not matches:
+            print(f"No matches found for {today}")
+            return
+        
+        records_to_upsert = []
+        for match in matches:
+            prediction_data = generate_prediction(match)
+            record = {
+                'id': match.id,
+                'home_team': match.homeTeam,
+                'away_team': match.awayTeam,
+                'league_name': match.leagueName,
+                'league_country': match.leagueCountry,
+                'status': map_status_label(match.statusShort),
+                'match_time': match.time,
+                'home_score': match.homeScore,
+                'away_score': match.awayScore,
+                'prediction': prediction_data.recommendedBet,
+                'confidence': prediction_data.confidence,
+                'odds': match.odds,
+                'updated_at': datetime.now(pytz.timezone(TIMEZONE)).isoformat(),
+            }
+            records_to_upsert.append(record)
+        
+        # Upsert into Supabase (insert or update if exists)
+        response = supabase.table('fixtures').upsert(records_to_upsert).execute()
+        print(f"Synced {len(records_to_upsert)} fixtures to Supabase")
+        
+    except Exception as e:
+        print(f"Error syncing fixtures: {e}")
+
+
+def should_sync_fixtures() -> bool:
+    """Check if fixtures were updated in the last 30 minutes."""
+    try:
+        today = current_accra_date()
+        
+        # Query the most recent fixture updated today
+        response = supabase.table('fixtures').select('updated_at').order(
+            'updated_at', desc=True
+        ).limit(1).execute()
+        
+        if not response.data:
+            # No fixtures in database, need to sync
+            return True
+        
+        last_update_str = response.data[0]['updated_at']
+        last_update = datetime.fromisoformat(last_update_str.replace('Z', '+00:00'))
+        
+        # Check if last update was more than 30 minutes ago
+        now = datetime.now(pytz.timezone(TIMEZONE))
+        time_diff = now - last_update.astimezone(pytz.timezone(TIMEZONE))
+        
+        return time_diff.total_seconds() > 1800  # 30 minutes
+        
+    except Exception as e:
+        print(f"Error checking sync status: {e}")
+        return True  # Sync on error
 
 
 def format_prediction_payload(match: MatchInput, prediction: PredictionOutput) -> dict:
@@ -322,11 +396,41 @@ def health():
 
 @app.get('/predictions', response_model=dict)
 def predictions():
-    today = current_accra_date()
-    print(f"Fetching matches for {today}...")
-    matches = fetch_fixtures_by_date(today)
-    prediction_list = [format_prediction_payload(match, generate_prediction(match)) for match in matches]
-    return {"status": "success", "data": prediction_list}
+    """Query predictions from Supabase. Auto-syncs if data is stale (>30 min old)."""
+    try:
+        # Check if we need to sync fresh data from API
+        if should_sync_fixtures():
+            print("Syncing fresh fixtures from API-Football...")
+            sync_fixtures()
+        
+        # Query fixtures from Supabase
+        today = current_accra_date()
+        response = supabase.table('fixtures').select('*').execute()
+        
+        if not response.data:
+            return {"status": "success", "data": []}
+        
+        # Format the response
+        predictions_data = []
+        for row in response.data:
+            predictions_data.append({
+                'id': row['id'],
+                'homeTeam': row['home_team'],
+                'awayTeam': row['away_team'],
+                'leagueName': row['league_name'],
+                'leagueCountry': row['league_country'],
+                'status': row['status'],
+                'time': row['match_time'],
+                'score': f"{row['home_score'] or 0}-{row['away_score'] or 0}",
+                'prediction': row['prediction'],
+                'confidence': row['confidence'],
+            })
+        
+        return {"status": "success", "data": predictions_data}
+        
+    except Exception as e:
+        print(f"Error fetching predictions: {e}")
+        return {"status": "error", "data": [], "message": str(e)}
 
 
 @app.post('/predict', response_model=dict)
