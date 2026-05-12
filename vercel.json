@@ -1,8 +1,28 @@
 {
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "main.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
     }
-  ]
+  ],
+  "routes": [
+    {
+      "src": "/(predictions|accuracy|health|api/.*)",
+      "dest": "/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "build": {
+    "env": {
+      "PIP_ONLY_BINARY": ":all:"
+    }
+  }
 }
