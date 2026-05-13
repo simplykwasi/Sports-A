@@ -15,20 +15,29 @@ TIMEZONE = 'Africa/Accra'
 IS_PRODUCTION = os.getenv('VERCEL_ENV', '').lower() == 'production'
 DEBUG_MODE = not IS_PRODUCTION
 
-# Supabase initialization
+# Supabase will be initialized lazily on first use
 SUPABASE_URL = os.getenv('SUPABASE_URL', '').strip()
 SUPABASE_KEY = os.getenv('SUPABASE_KEY', '').strip()
 
 supabase: Optional[Client] = None
-try:
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        raise Exception('Missing Supabase Credentials: SUPABASE_URL and/or SUPABASE_KEY are not set')
+
+def get_supabase_client() -> Optional[Client]:
+    """Lazy initialization of Supabase client. Only called when needed."""
+    global supabase
+    if supabase is not None:
+        return supabase
     
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    print('Supabase client initialized successfully')
-except Exception as e:
-    print(f'Warning: Supabase initialization failed: {e}')
-    supabase = None
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print('Supabase credentials not configured')
+        return None
+    
+    try:
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        print('Supabase client initialized successfully')
+        return supabase
+    except Exception as e:
+        print(f'Error initializing Supabase: {e}')
+        return None
 
 app = FastAPI(title='Sports Predictor Brain')
 app.add_middleware(
@@ -315,8 +324,9 @@ def map_status_label(status_short: Optional[str]) -> str:
 
 def sync_fixtures() -> None:
     """Fetch today's matches from API-Football and sync to Supabase."""
-    if not supabase:
-        print("Warning: Supabase client not initialized. Skipping sync.")
+    client = get_supabase_client()
+    if not client:
+        print('Supabase client not available. Skipping sync.')
         return
     
     try:
@@ -350,7 +360,7 @@ def sync_fixtures() -> None:
             records_to_upsert.append(record)
         
         # Upsert into Supabase (insert or update if exists)
-        response = supabase.table('fixtures').upsert(records_to_upsert).execute()
+        response = client.table('fixtures').upsert(records_to_upsert).execute()
         print(f"Synced {len(records_to_upsert)} fixtures to Supabase")
         
     except Exception as e:
@@ -359,15 +369,16 @@ def sync_fixtures() -> None:
 
 def should_sync_fixtures() -> bool:
     """Check if fixtures were updated in the last 30 minutes."""
-    if not supabase:
-        print("Warning: Supabase client not initialized. Skipping sync check.")
+    client = get_supabase_client()
+    if not client:
+        print('Supabase client not available. Skipping sync check.')
         return False
     
     try:
         today = current_accra_date()
         
         # Query the most recent fixture updated today
-        response = supabase.table('fixtures').select('updated_at').order(
+        response = client.table('fixtures').select('updated_at').order(
             'updated_at', desc=True
         ).limit(1).execute()
         
@@ -417,11 +428,12 @@ def health():
 @app.get('/predictions', response_model=dict)
 def predictions():
     """Query predictions from Supabase. Auto-syncs if data is stale (>30 min old)."""
-    if not supabase:
+    client = get_supabase_client()
+    if not client:
         return {
             "status": "error",
             "data": [],
-            "message": "Supabase client not initialized. Check environment variables."
+            "message": "Supabase client not available. Check environment variables."
         }
     
     try:
@@ -432,7 +444,7 @@ def predictions():
         
         # Query fixtures from Supabase
         today = current_accra_date()
-        response = supabase.table('fixtures').select('*').execute()
+        response = client.table('fixtures').select('*').execute()
         
         if not response.data:
             return {"status": "success", "data": []}

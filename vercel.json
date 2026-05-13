@@ -3,16 +3,15 @@
   "builds": [
     {
       "src": "main.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
+      "use": "@vercel/python",
+      "config": {
+        "runtime": "python3.12"
+      }
     }
   ],
   "routes": [
     {
-      "src": "^/api(?:/(.*))?$",
+      "src": "^/api(/.*)?$",
       "dest": "/main.py"
     },
     {
@@ -20,18 +19,12 @@
       "dest": "/main.py"
     },
     {
-      "src": "^/(.*)$",
+      "src": "^/(?!.*\\.(js|css|svg|png|jpg|jpeg|gif|ico|json|woff|woff2|ttf|eot|webp|webm|mp4|mp3)).*$",
       "dest": "/index.html"
+    },
+    {
+      "src": "^/(.*\\.(js|css|svg|png|jpg|jpeg|gif|ico|json|woff|woff2|ttf|eot|webp|webm|mp4|mp3))$",
+      "dest": "/$1"
     }
-  ],
-  "functions": {
-    "main.py": {
-      "runtime": "python3.12"
-    }
-  },
-  "build": {
-    "env": {
-      "PIP_ONLY_BINARY": ":all:"
-    }
-  }
+  ]
 }
