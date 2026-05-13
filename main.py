@@ -12,20 +12,22 @@ from supabase import create_client, Client
 API_KEY = os.getenv('API_FOOTBALL_API_KEY', '3041353cf06b3eb32032dc0a68762f98')
 BASE_URL = 'https://v3.football.api-sports.io'
 TIMEZONE = 'Africa/Accra'
+IS_PRODUCTION = os.getenv('VERCEL_ENV', '').lower() == 'production'
+DEBUG_MODE = not IS_PRODUCTION
 
 # Supabase initialization
-SUPABASE_URL = os.getenv('VITE_SUPABASE_URL', '').strip() or 'https://sijynfgkrcnhgmaqdcav.supabase.co'
-SUPABASE_KEY = os.getenv('VITE_SUPABASE_ANON_KEY', '').strip() or 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpanluZmdrcmNuaGdtYXFkY2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMTUwMDcsImV4cCI6MjA5MzU5MTAwN30.BUb1FNtJARVAOVQMDo479KFtlbNcf5-EZe7f3XYWOxI'
+SUPABASE_URL = os.getenv('SUPABASE_URL', '').strip()
+SUPABASE_KEY = os.getenv('SUPABASE_KEY', '').strip()
 
 supabase: Optional[Client] = None
 try:
     if not SUPABASE_URL or not SUPABASE_KEY:
-        raise Exception("Missing Supabase Credentials: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY are not set")
+        raise Exception('Missing Supabase Credentials: SUPABASE_URL and/or SUPABASE_KEY are not set')
     
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    print("Supabase client initialized successfully")
+    print('Supabase client initialized successfully')
 except Exception as e:
-    print(f"Warning: Supabase initialization failed: {e}")
+    print(f'Warning: Supabase initialization failed: {e}')
     supabase = None
 
 app = FastAPI(title='Sports Predictor Brain')
@@ -404,7 +406,7 @@ def format_prediction_payload(match: MatchInput, prediction: PredictionOutput) -
 
 @app.get('/')
 def root():
-    return {"status": "ready"}
+    return {"status": "online"}
 
 
 @app.get('/health')

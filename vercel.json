@@ -12,18 +12,23 @@
   ],
   "routes": [
     {
-      "src": "/",
+      "src": "^/api(?:/(.*))?$",
       "dest": "/main.py"
     },
     {
-      "src": "/(predictions|accuracy|health|api/.*)",
+      "src": "^/(predictions|accuracy|health)$",
       "dest": "/main.py"
     },
     {
-      "src": "/(.*)",
+      "src": "^/(.*)$",
       "dest": "/index.html"
     }
   ],
+  "functions": {
+    "main.py": {
+      "runtime": "python3.12"
+    }
+  },
   "build": {
     "env": {
       "PIP_ONLY_BINARY": ":all:"
